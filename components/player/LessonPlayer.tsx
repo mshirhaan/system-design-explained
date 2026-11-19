@@ -19,34 +19,36 @@ export function LessonPlayer({
   const steps = lesson.steps;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [autoplay, setAutoplay] = useState(true);
+  // Off by default: learners move step by step while each step keeps playing.
+  const [autoplay, setAutoplay] = useState(false);
   const [replays, setReplays] = useState(0);
+  // How many times the current step has looped. 0 = first play (things pop in).
+  const [loop, setLoop] = useState(0);
   const step = steps[index];
   const last = index === steps.length - 1;
-  const duration = stepDuration(step);
-
-  useEffect(() => {
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) setAutoplay(false);
-  }, []);
+  const steady = loop > 0;
+  const duration = stepDuration(step, steady);
 
   const go = useCallback((i: number) => {
     setIndex(Math.max(0, Math.min(steps.length - 1, i)));
+    setLoop(0);
     setReplays((r) => r + 1);
   }, [steps.length]);
 
-  // When a step finishes it either moves on (auto-advance) or holds on its final frame.
+  const replay = () => {
+    setPaused(false);
+    setLoop(0);
+    setReplays((r) => r + 1);
+  };
+
+  // At the end of a play: move on when auto-play is on, otherwise play the step again.
   const onEnd = useCallback(() => {
     if (autoplay && !last) go(index + 1);
+    else setLoop((n) => n + 1);
   }, [autoplay, last, index, go]);
 
-  const { svgRef, progress } = useSceneClock({ stepKey: `${index}-${replays}`, duration, paused, onEnd });
-  const lessonProgress = (index + progress) / steps.length;
-
-  const toggleAutoplay = (on: boolean) => {
-    setAutoplay(on);
-    // Turning auto-advance on after a step has finished moves on straight away.
-    if (on && progress >= 1 && !last) go(index + 1);
-  };
+  const { svgRef } = useSceneClock({ stepKey: `${index}-${replays}-${loop}`, duration, paused, onEnd });
+  const lessonProgress = (index + 1) / steps.length;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -58,8 +60,7 @@ export function LessonPlayer({
         e.preventDefault();
         setPaused((p) => !p);
       } else if (e.key === "r" || e.key === "R") {
-        setPaused(false);
-        setReplays((r) => r + 1);
+        replay();
       }
     };
     window.addEventListener("keydown", onKey);
@@ -85,20 +86,20 @@ export function LessonPlayer({
             ))}
           </div>
           <div className="player-ctrls">
-            <button className="btn" onClick={() => { setPaused(false); setReplays((r) => r + 1); }}>
+            <button className="btn" onClick={replay}>
               <ReplayIcon /> Replay
             </button>
             <button className="btn" onClick={() => setPaused((p) => !p)} aria-pressed={paused}>
               {paused ? <PlayIcon /> : <PauseIcon />} {paused ? "Play" : "Pause"}
             </button>
             <label className="toggle">
-              <input type="checkbox" id="autoplay" checked={autoplay} onChange={(e) => toggleAutoplay(e.target.checked)} />
-              <span>Auto-advance</span>
+              <input type="checkbox" id="autoplay" checked={autoplay} onChange={(e) => setAutoplay(e.target.checked)} />
+              <span>Auto-play lesson</span>
             </label>
           </div>
         </div>
         <div className="scene-wrap" data-duration={duration}>
-          <Scene key={`${index}-${replays}`} scene={lesson.scene} step={step} label={`${title}, step ${index + 1}: ${step.title}`} svgRef={svgRef} className="scene" />
+          <Scene key={`${index}-${replays}-${loop}`} steady={steady} scene={lesson.scene} step={step} label={`${title}, step ${index + 1}: ${step.title}`} svgRef={svgRef} className="scene" />
         </div>
         {lesson.phases && <TimingBar phases={lesson.phases} timing={step.timing} />}
         <ol className="stepper" aria-label="Steps">

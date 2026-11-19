@@ -13,13 +13,14 @@ import type { Entity, LabelDef, LinkDef, PacketDef, SceneDef, StepDef, TokenRowD
 
 const DEFAULT_DUR = 0.9;
 
-export function stepDuration(step: StepDef): number {
+export function stepDuration(step: StepDef, looping = false): number {
   let end = 0;
   for (const p of step.packets ?? []) end = Math.max(end, p.at + (p.dur ?? DEFAULT_DUR) + 0.4);
   for (const l of step.labels ?? []) end = Math.max(end, l.until ?? (l.from ?? 0) + 0.6);
   for (const l of step.links ?? []) end = Math.max(end, (l.from_t ?? 0) + 0.4);
   for (const r of step.tokens ?? []) for (const t of r.items) end = Math.max(end, t.until ?? (t.from ?? 0) + 0.4);
-  return Math.max(3, end + (step.hold ?? 1.8));
+  // Repeat plays only need a short breather before the moving parts start again.
+  return Math.max(looping ? 2.5 : 3, end + (looping ? 1 : step.hold ?? 1.8));
 }
 
 const s = (t: number) => `${f(t)}s`;
@@ -31,8 +32,15 @@ function resolve(points: Record<string, XY>, at: string | XY): Pt {
   return P(p[0], p[1]);
 }
 
-/** Fades and pops its children in at `from`, and out at `until`. */
-function Appear({ from = 0, until, pop = true, children }: { from?: number; until?: number; pop?: boolean; children: React.ReactNode }) {
+/**
+ * Fades and pops its children in at `from`, and out at `until`.
+ * When `steady` is set (a step replaying on a loop), anything that would simply
+ * stay on screen is drawn still, so only the moving parts repeat.
+ */
+function Appear({
+  from = 0, until, pop = true, steady = false, children,
+}: { from?: number; until?: number; pop?: boolean; steady?: boolean; children: React.ReactNode }) {
+  if (steady && until === undefined) return <g>{children}</g>;
   return (
     <g opacity={0}>
       <animate attributeName="opacity" values="0;1" dur="0.2s" begin={s(from)} fill="freeze" />
@@ -57,25 +65,25 @@ function Appear({ from = 0, until, pop = true, children }: { from?: number; unti
   );
 }
 
-function Label({ def, points }: { def: LabelDef; points: Record<string, XY> }) {
+function Label({ def, points, steady }: { def: LabelDef; points: Record<string, XY>; steady?: boolean }) {
   const p = resolve(points, def.at);
   return (
     <g transform={`translate(${f(p.x)} ${f(p.y)})`}>
-      <Appear from={def.from} until={def.until}>
+      <Appear from={def.from} until={def.until} steady={steady}>
         <Pill x={0} y={0} text={def.text} icon={def.icon} tone={def.tone} size={def.size ?? 15} />
       </Appear>
     </g>
   );
 }
 
-function Link({ def, points }: { def: LinkDef; points: Record<string, XY> }) {
+function Link({ def, points, steady }: { def: LinkDef; points: Record<string, XY>; steady?: boolean }) {
   const a = resolve(points, def.from);
   const b = resolve(points, def.to);
   const style = def.style ?? "solid";
   if (style === "pipe") {
     const d = `M${f(a.x)},${f(a.y)} L${f(b.x)},${f(b.y)}`;
     return (
-      <Appear from={def.from_t} pop={false}>
+      <Appear from={def.from_t} pop={false} steady={steady}>
         <path d={d} stroke={INK} strokeWidth={11} strokeLinecap="round" />
         <path d={d} stroke="#b2d491" strokeWidth={7} strokeLinecap="round" />
         <path d={d} stroke="#fff" strokeOpacity={0.55} strokeWidth={1.6} strokeLinecap="round" transform="translate(0 -1.6)" />
@@ -87,7 +95,7 @@ function Link({ def, points }: { def: LinkDef; points: Record<string, XY> }) {
   const muted = style === "muted" || style === "dashed";
   const marker = `url(#${muted ? "arrow-muted" : "arrow"})`;
   return (
-    <Appear from={def.from_t} pop={false}>
+    <Appear from={def.from_t} pop={false} steady={steady}>
       <path
         d={`M${f(p1.x)},${f(p1.y)} L${f(p2.x)},${f(p2.y)}`}
         fill="none"
@@ -200,14 +208,14 @@ function pointAlong(pts: Pt[], t: number): Pt {
   return pts[pts.length - 1];
 }
 
-function TokenRow({ def, points }: { def: TokenRowDef; points: Record<string, XY> }) {
+function TokenRow({ def, points, steady }: { def: TokenRowDef; points: Record<string, XY>; steady?: boolean }) {
   const p = resolve(points, def.at);
   const [gx, gy] = def.gap ?? [22, 11];
   return (
     <g>
       {def.items.map((t, i) => (
         <g key={i} transform={`translate(${f(p.x + gx * i)} ${f(p.y + gy * i)})`}>
-          <Appear from={t.from} until={t.until}>
+          <Appear from={t.from} until={t.until} steady={steady}>
             <PacketShape kind={t.kind} label={t.kind === "row" ? t.tag : undefined} />
             {t.tag && t.kind !== "row" && (
               <g transform="translate(0 -20)">
@@ -235,9 +243,11 @@ function FocusRing({ e }: { e: Entity }) {
 }
 
 export function Scene({
-  scene, step, label, svgRef, className,
+  scene, step, label, svgRef, className, steady = false,
 }: {
   scene: SceneDef; step: StepDef; label: string; svgRef?: Ref<SVGSVGElement>; className?: string;
+  /** True on repeat plays of a step: static parts stay put, moving parts replay. */
+  steady?: boolean;
 }) {
   const [x, y, w, h] = scene.viewBox;
   const points = scene.points;
@@ -249,11 +259,11 @@ export function Scene({
       <SceneDefs />
       <rect x={x} y={y} width={w} height={h} fill="url(#iso-grid)" mask="url(#grid-mask)" />
       <g>{scene.entities.filter((e) => focus.has(e.id)).map((e) => <FocusRing key={e.id} e={e} />)}</g>
-      <g>{(step.links ?? []).map((l, i) => <Link key={i} def={l} points={points} />)}</g>
+      <g>{(step.links ?? []).map((l, i) => <Link key={i} def={l} points={points} steady={steady} />)}</g>
       <g>{ordered.map((e) => <EntityView key={e.id} e={e} screen={step.screen} />)}</g>
-      <g>{(step.tokens ?? []).map((r, i) => <TokenRow key={i} def={r} points={points} />)}</g>
+      <g>{(step.tokens ?? []).map((r, i) => <TokenRow key={i} def={r} points={points} steady={steady} />)}</g>
       <g>{(step.packets ?? []).map((p, i) => <Packet key={i} def={p} points={points} />)}</g>
-      <g>{(step.labels ?? []).map((l, i) => <Label key={i} def={l} points={points} />)}</g>
+      <g>{(step.labels ?? []).map((l, i) => <Label key={i} def={l} points={points} steady={steady} />)}</g>
     </svg>
   );
 }

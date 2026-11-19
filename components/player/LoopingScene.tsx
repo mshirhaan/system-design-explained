@@ -10,9 +10,9 @@ export function LoopingScene({ scene, step, label, className }: { scene: SceneDe
   const [loop, setLoop] = useState(0);
   const { svgRef } = useSceneClock({
     stepKey: loop,
-    duration: stepDuration(step),
+    duration: stepDuration(step, loop > 0),
     paused: false,
     onEnd: () => setLoop((n) => n + 1),
   });
-  return <Scene key={loop} scene={scene} step={step} label={label} svgRef={svgRef} className={className} />;
+  return <Scene key={loop} steady={loop > 0} scene={scene} step={step} label={label} svgRef={svgRef} className={className} />;
 }

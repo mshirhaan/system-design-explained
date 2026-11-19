@@ -20,6 +20,9 @@ Read before working:
 Scenes are SVG. Every timed element uses SVG's built-in timeline (SMIL: `<animate>`, `<animateMotion>`, `<set>`), with times in
 seconds from the start of a step. The player restarts, pauses and resumes a step with `setCurrentTime(0)`, `pauseAnimations()` and
 `unpauseAnimations()`, so steps are declarative data, and Back/Next/Replay always show the same thing.
+Each step loops until the learner moves on. The first play pops everything in; repeat plays render with `steady`, where
+labels, links and token rows without an `until` stay still and only packets (and timed labels) replay. Auto-play is optional
+and off by default. Design every step so its packets make sense when they repeat.
 
 ## Adding a lesson
 1. Create `content/lessons/<slug>.ts` exporting a `LessonContent` (see `what-happens-when-you-press-enter.ts`). The slug must match
