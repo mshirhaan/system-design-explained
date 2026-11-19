@@ -25,12 +25,19 @@ export function LessonPlayer({ lesson, title }: { lesson: LessonContent; title: 
     setReplays((r) => r + 1);
   }, [steps.length]);
 
+  // When a step finishes it either moves on (auto-advance) or holds on its final frame.
   const onEnd = useCallback(() => {
     if (autoplay && !last) go(index + 1);
-    else setReplays((r) => r + 1); // loop the current step
   }, [autoplay, last, index, go]);
 
   const { svgRef, progress } = useSceneClock({ stepKey: `${index}-${replays}`, duration, paused, onEnd });
+  const lessonProgress = (index + progress) / steps.length;
+
+  const toggleAutoplay = (on: boolean) => {
+    setAutoplay(on);
+    // Turning auto-advance on after a step has finished moves on straight away.
+    if (on && progress >= 1 && !last) go(index + 1);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -54,8 +61,19 @@ export function LessonPlayer({ lesson, title }: { lesson: LessonContent; title: 
     <section className="player">
       <div className="player-stage card">
         <div className="player-top">
-          <div className="player-progress" aria-hidden="true">
-            <span style={{ width: `${progress * 100}%` }} />
+          <div
+            className="player-progress"
+            role="progressbar"
+            aria-label="Lesson progress"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(lessonProgress * 100)}
+            title={`Lesson progress: step ${index + 1} of ${steps.length}`}
+          >
+            <span style={{ width: `${lessonProgress * 100}%` }} />
+            {steps.slice(1).map((_, i) => (
+              <i key={i} style={{ left: `${((i + 1) / steps.length) * 100}%` }} />
+            ))}
           </div>
           <div className="player-ctrls">
             <button className="btn" onClick={() => { setPaused(false); setReplays((r) => r + 1); }}>
@@ -65,7 +83,7 @@ export function LessonPlayer({ lesson, title }: { lesson: LessonContent; title: 
               {paused ? <PlayIcon /> : <PauseIcon />} {paused ? "Play" : "Pause"}
             </button>
             <label className="toggle">
-              <input type="checkbox" id="autoplay" checked={autoplay} onChange={(e) => setAutoplay(e.target.checked)} />
+              <input type="checkbox" id="autoplay" checked={autoplay} onChange={(e) => toggleAutoplay(e.target.checked)} />
               <span>Auto-advance</span>
             </label>
           </div>

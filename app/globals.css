@@ -832,11 +832,20 @@ a.lesson-row:hover {
   border-radius: 99px;
   background: var(--card);
   overflow: hidden;
+  position: relative;
 }
 .player-progress span {
   display: block;
   height: 100%;
   background: var(--green-2);
+}
+/* Tick marks between steps */
+.player-progress i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--sheet);
 }
 .player-ctrls {
   display: flex;
