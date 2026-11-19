@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { LessonPlayer } from "@/components/player/LessonPlayer";
 import { Quiz } from "@/components/player/Quiz";
 import { Scene } from "@/components/scene/Scene";
@@ -8,7 +8,7 @@ import type { SceneDef } from "@/components/scene/types";
 import { TrackCube } from "@/components/site/TrackCube";
 import { builtSlugs, hasContent, loadLesson } from "@/content/lessons";
 import { canAccess, getViewer, paywallEnabled } from "@/lib/access";
-import { getLessonBySlug, getStage, getTrack, lessons, levelLabel, neighbours, type TrackColor } from "@/lib/curriculum";
+import { getLessonBySlug, getStage, getTrack, labPage, lessonHref, lessons, levelLabel, neighbours, type TrackColor } from "@/lib/curriculum";
 import { site } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -37,6 +37,9 @@ export default async function LessonPage({ params }: Props) {
   const { slug } = await params;
   const lesson = getLessonBySlug(slug);
   if (!lesson) notFound();
+  // Some course entries are interactive labs; send learners straight there.
+  const lab = labPage(slug);
+  if (lab) redirect(lab);
   const track = getTrack(lesson.trackId);
   const stage = getStage(track.stage);
   const viewer = await getViewer();
@@ -141,7 +144,7 @@ export default async function LessonPage({ params }: Props) {
 
       <nav className="lesson-next" aria-label="More lessons">
         {prev ? (
-          <Link href={`/lessons/${prev.slug}`} className="next-card card-pop">
+          <Link href={lessonHref(prev)} className="next-card card-pop">
             <small>← Previous · {prev.id}</small>
             <b>{prev.title}</b>
           </Link>
@@ -149,7 +152,7 @@ export default async function LessonPage({ params }: Props) {
           <span />
         )}
         {next && (
-          <Link href={`/lessons/${next.slug}`} className="next-card card-pop is-next">
+          <Link href={lessonHref(next)} className="next-card card-pop is-next">
             <small>Next · {next.id} →</small>
             <b>{next.title}</b>
           </Link>

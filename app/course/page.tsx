@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TrackCube } from "@/components/site/TrackCube";
 import { hasContent } from "@/content/lessons";
-import { levelLabel, stages, stats, tracks } from "@/lib/curriculum";
+import { labPage, lessonHref, levelLabel, stages, stats, tracks } from "@/lib/curriculum";
 
 export const metadata: Metadata = {
   title: "Course map: every system design lesson",
@@ -59,10 +59,10 @@ export default function CoursePage() {
                   </summary>
                   <ol className="lesson-list">
                     {t.lessons.map((l) => {
-                      const ready = hasContent(l.slug);
+                      const ready = hasContent(l.slug) || !!labPage(l.slug);
                       return (
                         <li key={l.id}>
-                          <Link href={`/lessons/${l.slug}`} className="lesson-row">
+                          <Link href={lessonHref(l)} className="lesson-row">
                             <span className="lesson-num">{l.id}</span>
                             <div>
                               <div className="lesson-title">{l.title}</div>

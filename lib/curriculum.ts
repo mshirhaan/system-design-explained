@@ -63,6 +63,21 @@ export const tracks: Track[] = raw.tracks.map((t) => ({
 
 export const lessons: Lesson[] = tracks.flatMap((t) => t.lessons);
 
+/** Course entries that are interactive labs rather than lessons, and where they live. */
+const LAB_PAGES: Record<string, string> = {
+  "design-sandbox": "/labs/sandbox",
+  "scale-challenges": "/labs/sandbox",
+};
+
+/** The page a course entry links to: its lab if it has one, otherwise its lesson page. */
+export function lessonHref(lesson: Pick<Lesson, "slug">): string {
+  return LAB_PAGES[lesson.slug] ?? `/lessons/${lesson.slug}`;
+}
+
+export function labPage(slug: string): string | undefined {
+  return LAB_PAGES[slug];
+}
+
 export function getLessonBySlug(slug: string): Lesson | undefined {
   return lessons.find((l) => l.slug === slug);
 }
