@@ -16,6 +16,10 @@ const registry: Record<string, () => Promise<{ default: LessonContent }>> = {
   "latency-numbers-every-engineer-should-know": () => import("./latency-numbers-every-engineer-should-know"),
   "throughput-bandwidth-and-queues": () => import("./throughput-bandwidth-and-queues"),
   "proxies-and-reverse-proxies": () => import("./proxies-and-reverse-proxies"),
+  "rest-from-first-principles": () => import("./rest-from-first-principles"),
+  "idempotency-and-safe-retries": () => import("./idempotency-and-safe-retries"),
+  "pagination-offset-vs-cursor": () => import("./pagination-offset-vs-cursor"),
+  "polling-long-polling-sse-and-websockets": () => import("./polling-long-polling-sse-and-websockets"),
 };
 
 export function hasContent(slug: string): boolean {

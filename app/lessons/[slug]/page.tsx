@@ -119,6 +119,19 @@ export default async function LessonPage({ params }: Props) {
                 <h2>Key idea</h2>
                 <p>{content.keyIdea}</p>
               </div>
+              {content.terms && content.terms.length > 0 && (
+                <div className="terms card">
+                  <h2>Key terms</h2>
+                  <dl>
+                    {content.terms.map((t) => (
+                      <div key={t.term}>
+                        <dt>{t.term}</dt>
+                        <dd>{t.meaning}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
             </aside>
           </div>
         </>

@@ -102,12 +102,24 @@ function Link({ def, points }: { def: LinkDef; points: Record<string, XY> }) {
   );
 }
 
-function PacketShape({ kind }: { kind: PacketDef["kind"] }) {
+const rowW = (label?: string) => Math.max(64, (label?.length ?? 0) * 6.7 + 16);
+
+function PacketShape({ kind, label }: { kind: PacketDef["kind"]; label?: string }) {
   const k = PACKETS[kind];
   return (
     <>
       <circle r={13} fill={k.glow} opacity={0.45} filter="url(#blur-sm)" />
-      {kind === "message" ? (
+      {kind === "row" ? (
+        <>
+          <rect x={-rowW(label) / 2} y={-9} width={rowW(label)} height={18} rx={3.5} fill={k.fill} stroke={INK} strokeWidth={1.5} />
+          {!label && <path d="M-22,0 H6 M12,0 H22" stroke="#a59c90" strokeWidth={1.6} strokeLinecap="round" />}
+          {label && (
+            <text className="st" x={0} y={0} dy=".35em" textAnchor="middle" fontSize={11} fontWeight={700}>
+              {label}
+            </text>
+          )}
+        </>
+      ) : kind === "message" ? (
         <>
           <rect x={-8} y={-8} width={16} height={16} rx={4} fill={k.fill} stroke={INK} strokeWidth={1.7} />
           <path d="M-4.5,-2.5 L0,1 L4.5,-2.5" fill="none" stroke={INK} strokeWidth={1.4} strokeLinecap="round" />
@@ -196,8 +208,8 @@ function TokenRow({ def, points }: { def: TokenRowDef; points: Record<string, XY
       {def.items.map((t, i) => (
         <g key={i} transform={`translate(${f(p.x + gx * i)} ${f(p.y + gy * i)})`}>
           <Appear from={t.from} until={t.until}>
-            <PacketShape kind={t.kind} />
-            {t.tag && (
+            <PacketShape kind={t.kind} label={t.kind === "row" ? t.tag : undefined} />
+            {t.tag && t.kind !== "row" && (
               <g transform="translate(0 -20)">
                 <Pill x={0} y={0} text={t.tag} size={10} weight={700} />
               </g>

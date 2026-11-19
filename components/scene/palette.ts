@@ -31,4 +31,5 @@ export const PACKETS = {
   message: { fill: "#f6cd82", glow: "#f3b447" },
   secure: { fill: "#c9b8e5", glow: "#a58ad6" },
   heartbeat: { fill: "#f4fbf0", glow: "#9fd68f" },
+  row: { fill: "#fbf6ef", glow: "#d8cbb8" },
 } as const;

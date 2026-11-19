@@ -32,7 +32,7 @@ export type Entity =
   | (EntityBase & { kind: "phone" })
   | (EntityBase & { kind: "router" });
 
-export type PacketKind = "request" | "response" | "empty" | "message" | "secure" | "heartbeat";
+export type PacketKind = "request" | "response" | "empty" | "message" | "secure" | "heartbeat" | "row";
 
 export interface PacketDef {
   /** Point names from the scene's `points` map. The packet hops through each one. */
@@ -130,6 +130,8 @@ export interface LessonContent {
   intro: string;
   learn: string[];
   keyIdea: string;
+  /** Key terms defined in plain language, shown beside the lesson. */
+  terms?: { term: string; meaning: string }[];
   scene: SceneDef;
   phases?: Phase[];
   steps: StepDef[];

@@ -1,6 +1,6 @@
 # System Design Explained: product plan
 
-Status: Phase 1 done. Phase 2 in progress: Track 1 (How the Internet Works, 11 lessons) finished. Next: Tracks 2, 3, 4 and 18 basics.
+Status: Phase 1 done. Phase 2 in progress: Track 1 (11 lessons) and Track 2 lessons 2.1–2.4 built. A lesson quality bar was added to CLAUDE.md; lesson 1.10 meets it. Next: bring the other built lessons up to the bar, then finish Track 2.
 Domain: **systemdesignexplained.com** (chosen; `.dev` and `.app` were also free at the time of checking).
 
 ## 1. What we are building
