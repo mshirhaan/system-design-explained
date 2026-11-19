@@ -1,0 +1,491 @@
+<title>System Design Mastery Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: Paper Isometrics. A path ribbon of 8 stages, a filter bar, then one card per track with its lessons listed underneath. */
+:root{
+  --paper:#f4ebe0; --sheet:#f9f2e8; --card:#f6eee3; --line:#ddd3c5; --ink:#1d1b18; --ink-2:#34302b; --muted:#6f6961;
+  --green:#cfe3b2; --violet:#e7ddf5; --orange:#fcdcbd; --yellow:#fee7b8; --blue:#d6e5f6; --pink:#f6dbe4;
+  --font:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --pop:1.5px 2.5px 0 var(--ink);
+  color-scheme:light;
+}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--font);font-size:13px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 64px;
+  background-image:linear-gradient(26.57deg,transparent 49.4%,#a8916f22 50%,transparent 50.6%),linear-gradient(-26.57deg,transparent 49.4%,#a8916f22 50%,transparent 50.6%);
+  background-size:56px 28px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:22px}
+h1{font-size:clamp(24px,4vw,36px);line-height:1.15;margin:0;letter-spacing:-.02em;text-wrap:balance}
+h1 mark{background:var(--green);color:inherit;padding:0 6px;border-radius:5px}
+.lede{max-width:70ch;color:var(--ink-2);margin:8px 0 0}
+.panel{background:var(--sheet);border:1px solid var(--line);border-radius:14px;box-shadow:inset 0 1px 0 #ffffffa0,0 1px 0 var(--line)}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--sheet);border:1.5px solid var(--ink);border-radius:11px;box-shadow:var(--pop);padding:8px 14px;min-width:120px}
+.stat small{display:block;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.stat b{font-size:22px;font-variant-numeric:tabular-nums}
+
+.path{padding:16px;display:grid;gap:10px}
+.path h2,.how h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:0}
+.stages{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;counter-reset:s}
+@media (max-width:980px){.stages{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:520px){.stages{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stage{border:1.5px solid var(--ink);border-radius:10px;padding:8px 10px;background:var(--card);cursor:pointer;text-align:left;font:inherit;color:inherit;box-shadow:var(--pop);transition:transform .12s,box-shadow .12s}
+.stage:hover{transform:translate(-1px,-1px);box-shadow:2.5px 3.5px 0 var(--ink)}
+.stage[aria-pressed="true"]{background:var(--green)}
+.stage:focus-visible,.btn:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #5a43a6;outline-offset:3px}
+.stage small{display:block;font-size:9.5px;color:var(--muted);letter-spacing:.06em}
+.stage b{display:block;font-size:12px;line-height:1.3}
+.stage span{font-size:10.5px;color:var(--muted)}
+
+.how{padding:18px;display:grid;gap:12px}
+.how-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.how-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.how-grid{grid-template-columns:1fr}}
+.how-grid div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.how-grid b{display:block;font-size:12.5px}
+.how-grid p{margin:2px 0 0;font-size:12px;color:var(--ink-2)}
+
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-block:10px;border-bottom:1px dashed var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;font-size:12px;color:var(--ink);background:var(--sheet);border:1.5px solid var(--ink);border-radius:9px;padding:5px 11px;box-shadow:var(--pop);cursor:pointer;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:2.5px 3.5px 0 var(--ink)}
+.btn[aria-pressed="true"]{background:var(--green)}
+#q{font:inherit;font-size:12.5px;border:1.5px solid var(--ink);border-radius:9px;padding:6px 11px;background:var(--sheet);color:var(--ink);min-width:0;flex:1 1 220px;box-shadow:inset 1px 1.5px 0 #0000000d}
+.count{font-size:11.5px;color:var(--muted)}
+
+.tracks{display:grid;gap:14px}
+details.track{background:var(--sheet);border:1.5px solid var(--ink);border-radius:14px;box-shadow:var(--pop);overflow:hidden}
+details.track>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:54px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px}
+details.track>summary::-webkit-details-marker{display:none}
+.tico{width:54px;height:54px}
+.thead small{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.thead h3{margin:0;font-size:16px;line-height:1.3}
+.thead p{margin:2px 0 0;font-size:12px;color:var(--ink-2);max-width:78ch}
+.tmeta{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:11px;color:var(--muted);white-space:nowrap}
+.chev{width:26px;height:26px;border:1.5px solid var(--ink);border-radius:8px;display:grid;place-items:center;background:var(--card);transition:transform .2s}
+details[open] .chev{transform:rotate(180deg)}
+@media (max-width:560px){details.track>summary{grid-template-columns:40px minmax(0,1fr)} .tico{width:40px;height:40px} .tmeta{grid-column:1/-1;flex-direction:row;justify-content:space-between;align-items:center}}
+
+.lessons{border-top:1.5px solid var(--ink);list-style:none;margin:0;padding:0}
+.lesson{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;padding:10px 16px;border-top:1px solid var(--line)}
+.lesson:first-child{border-top:0}
+.lesson:nth-child(even){background:#f6eee380}
+.num{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px}
+.lt{font-weight:700;font-size:13px}
+.ls{font-size:12px;color:var(--ink-2);margin-top:1px}
+.ls::before{content:"▶ ";font-size:9px;color:var(--muted)}
+.tags{display:flex;gap:5px;align-items:flex-start;flex-wrap:wrap;justify-content:flex-end}
+.tag{font-size:10px;font-weight:700;letter-spacing:.04em;border:1.3px solid var(--ink);border-radius:999px;padding:0 8px;white-space:nowrap;background:var(--sheet)}
+.tag.free{background:var(--green)}
+.tag.pro{background:var(--violet)}
+.tag.lvB{background:var(--sheet)} .tag.lvI{background:var(--yellow)} .tag.lvA{background:var(--orange)}
+.cap{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:12px 16px;background:var(--yellow);border-top:1.5px solid var(--ink);font-size:12px}
+.cap b{font-size:12.5px}
+@media (max-width:560px){.lesson{grid-template-columns:34px minmax(0,1fr)} .tags{grid-column:2;justify-content:flex-start}.cap{grid-template-columns:34px minmax(0,1fr)}}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+footer{color:var(--muted);font-size:11.5px;max-width:80ch}
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:14px">
+    <div>
+      <h1>System Design <mark>Mastery Map</mark></h1>
+      <p class="lede">The full plan: from "what is a server?" to designing a stock exchange under interview pressure. Every lesson is an animated scene you can step through and break. The ▶ line under each lesson says what the animation shows.</p>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <section class="panel path">
+    <h2>The path, in order</h2>
+    <div class="stages" id="stages"></div>
+  </section>
+
+  <section class="panel how">
+    <h2>What turns lessons into mastery</h2>
+    <div class="how-grid">
+      <div><b>Step-through scenes</b><p>Every lesson is 6–12 animated steps. Pause, rewind, and watch data move inside the system.</p></div>
+      <div><b>"Break it" controls</b><p>Sliders and buttons: 10× traffic, kill a node, drop the index, add latency. You see the failure happen.</p></div>
+      <div><b>Checkpoint per track</b><p>Each track ends with a scenario challenge (yellow rows below). Pass it to unlock the badge.</p></div>
+      <div><b>Spaced review</b><p>Short quizzes come back after 1, 3, 7 and 21 days so the ideas stick.</p></div>
+      <div><b>Interview drills</b><p>Timed 45-minute design rounds with a rubric, model answers and trade-off discussion.</p></div>
+      <div><b>Design sandbox</b><p>Drag components onto a canvas, send simulated traffic, and watch where it falls over.</p></div>
+    </div>
+  </section>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Access">
+      <button class="btn" data-acc="all" aria-pressed="true">All</button>
+      <button class="btn" data-acc="free" aria-pressed="false">Free</button>
+      <button class="btn" data-acc="pro" aria-pressed="false">Pro</button>
+    </div>
+    <div class="seg" role="group" aria-label="Level">
+      <button class="btn" data-lv="all" aria-pressed="true">Any level</button>
+      <button class="btn" data-lv="B" aria-pressed="false">Beginner</button>
+      <button class="btn" data-lv="I" aria-pressed="false">Intermediate</button>
+      <button class="btn" data-lv="A" aria-pressed="false">Advanced</button>
+    </div>
+    <input id="q" type="search" placeholder="Search lessons: redis, index, raft, kafka…" aria-label="Search lessons">
+    <button class="btn" id="toggleAll">Expand all</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <section class="tracks" id="tracks"></section>
+
+  <footer>Free lessons: all of Foundations, the first lesson of every Pro track, the interview basics and the first case study. During testing everything stays open; one setting locks the Pro lessons later. Time estimates assume about 12 minutes per lesson and 30 minutes per checkpoint.</footer>
+</div>
+
+<script>
+/* Format per lesson line: Title | level (B/I/A) | F for free | what the animation shows */
+const STAGES = [
+  ['Foundations','How computers talk'],['Building blocks','APIs, scale, numbers'],['Data','Databases inside out'],
+  ['Speed & async','Caches, queues, streams'],['Distributed','Theory that holds it up'],['Production','Run it for real'],
+  ['Interview','The design round'],['Case studies & labs','Design real systems'],
+];
+const TRACKS = [
+{stage:0,color:'blue',name:'How the Internet Works',why:'Zero to confident: what actually happens between a tap and a reply.',cap:'Trace a page load end to end and name where every millisecond goes.',L:`
+What happens when you press Enter|B|F|Full trip: browser, DNS, TCP, TLS, server, database and back, with a running stopwatch
+Clients, servers and the request-response loop|B|F|A phone asks, a server answers; why the server never speaks first
+IP addresses, ports and packets|B|F|A message splits into packets that hop across routers and reassemble in order
+DNS from the inside|B|F|Resolver walks root, TLD and authoritative servers; later lookups hit the cache until TTL runs out
+TCP: reliable delivery|B|F|Three-way handshake, numbered segments, ACKs, a lost packet and its retransmit
+UDP and when to skip reliability|B|F|Video-call frames fly without ACKs; a lost frame is simply skipped
+TLS and HTTPS|B|F|Certificate check, key exchange, then the payload turns into scrambled ciphertext on the wire
+HTTP/1.1 vs HTTP/2 vs HTTP/3|I|F|One slow file blocks the line in 1.1; streams interleave in 2; QUIC survives a lost packet in 3
+Latency numbers every engineer should know|B|F|RAM, SSD, same-datacenter and cross-ocean calls scaled to human time: seconds vs months
+Throughput, bandwidth and queues|I|F|A pipe fills, a queue forms, waiting time explodes as utilisation nears 100% (Little's law)
+Proxies and reverse proxies|B|F|Forward proxy hides the client; reverse proxy hides the servers and terminates TLS`},
+{stage:1,color:'purple',name:'APIs & Communication',why:'How services talk, and how to pick the right way for each job.',cap:'Design the API for a food-delivery app: endpoints, pagination, auth and real-time order updates.',L:`
+REST from first principles|B|F|Resources, verbs and status codes; the same URL with GET, POST, PUT and DELETE
+Idempotency and safe retries|I|F|A payment request retried after a timeout charges twice, then an idempotency key stops it
+Pagination: offset vs cursor|I||Offset pages skip and duplicate rows as new rows arrive; cursors stay stable
+Polling, long polling, SSE and WebSockets|B|F|Alice and Bob chat four ways; count wasted requests and delivery delay
+Webhooks|I||Server calls you back; retries with backoff, signature check, replay protection
+GraphQL and the N+1 problem|I||One query fans out to resolvers; a DataLoader batches 50 database calls into 1
+gRPC and Protocol Buffers|I||Binary frames vs JSON text; bidirectional streaming over one HTTP/2 connection
+API gateway|I||One front door: auth, rate limit, routing and response aggregation for many services
+Sessions vs tokens (JWT)|I||Server-side session lookup vs a signed token verified anywhere; what logout really means
+OAuth 2.0 and OpenID Connect|A||Authorization-code flow with PKCE between app, browser, auth server and API
+Serialization formats|I||JSON vs Protobuf vs Avro: size on the wire, schema evolution, a field added safely
+API versioning and backward compatibility|I||Old and new clients hit the same service; additive changes vs breaking ones`},
+{stage:1,color:'yellow',name:'Napkin Math',why:'Estimate load, storage and cost in your head. Interviewers watch for this.',cap:'Estimate servers, storage and bandwidth for a photo-sharing app with 50M daily users.',L:`
+Powers of two and units|B|F|Bytes stack into KB, MB, GB, TB, PB as blocks; a tweet vs a photo vs a movie
+From daily users to requests per second|B|F|50M users × actions ÷ 86,400 seconds; average vs peak traffic curve
+Storage estimation|I||A year of uploads piles up; replication factor triples the stack
+Bandwidth and egress cost|I||Video bitrate × concurrent viewers; where the CDN bill comes from
+How many servers do I need?|I||Requests per second ÷ capacity per box, plus headroom for peaks and failures
+Estimation drills|I||Five timed exercises with worked answers: Twitter, YouTube, WhatsApp, Uber, Google Search`},
+{stage:1,color:'green',name:'Scaling the Web Tier',why:'Go from one server to millions of users, one bottleneck at a time.',cap:'Your launch day traffic is 20× normal. Scale the app without downtime.',L:`
+One server does everything|B|F|App, database and files on one box until the CPU graph hits the ceiling
+Vertical vs horizontal scaling|B|F|Bigger box vs more boxes; cost curve and the hard ceiling of one machine
+Stateless servers and sessions|B|F|A user bounces between servers and gets logged out; session moves to a shared store
+Load balancers: L4 vs L7|I|F|Packets routed by IP and port vs requests routed by URL and headers
+Load-balancing algorithms|I||Round robin, least connections, weighted and hash-based on a live traffic mix
+Health checks and failover|I||A server stops answering pings and is pulled from rotation in seconds
+CDNs and edge caching|I||Users far away hit nearby edges; cache hit, cache miss and origin shield
+Cache invalidation at the edge|I||A wrong image is cached worldwide; purge vs versioned file names
+Autoscaling|I||Traffic rises, new instances boot with a lag, then scale in after the wave
+Connection pooling|I||Thousands of app threads vs 100 database connections; the pool queues them
+Multi-region and geo-routing|A||DNS sends users to the nearest region; a region fails and traffic drains away`},
+{stage:2,color:'orange',name:'Inside a Database',why:'What a database actually does with your data on disk. This is where most courses stop and we start.',cap:'A query went from 5 ms to 9 seconds. Find out why using EXPLAIN and fix it.',L:`
+How a row is stored on disk|I|F|Rows packed into 8 KB pages, pages into a heap file, a new row finding free space
+Memory vs disk and the buffer pool|I||Pages loaded into RAM, dirty pages flushed, LRU eviction of cold pages
+Full table scan|B||Without an index the database reads every page to find one row; the counter climbs
+B-tree indexes from scratch|I||Keys inserted, a node fills and splits, the tree grows one level
+How a query uses an index|I||Index seek walks root to leaf then fetches the row; compare pages read vs a full scan
+Composite indexes and the leftmost-prefix rule|A||Index on (country, city) helps one query and is useless for another
+Covering indexes|A||Query answered from the index alone, no trip to the table
+Hash indexes|I||Exact lookups in one hop; range queries fall apart
+The query planner and EXPLAIN|A||Planner weighs plans by cost estimates and picks one; reading the plan tree
+Joins: nested loop, hash and merge|A||Three join algorithms run side by side on the same two tables
+Write-ahead log and crash recovery|A||Write logged first, power cut, database replays the log on restart
+LSM trees|A||Writes hit a memtable, flush to SSTables, compaction merges them in the background
+Bloom filters|A||A bit array answers "definitely not here" and skips disk reads
+Row stores vs column stores|A||Analytics query reads one column from many rows; columnar compression shrinks it`},
+{stage:2,color:'pink',name:'Transactions & Concurrency',why:'Two users touching the same data at the same moment. What can go wrong and how databases stop it.',cap:'Two people buy the last concert ticket at the same moment. Make sure only one gets it.',L:`
+ACID, made visible|I|F|Bank transfer fails halfway; atomicity rolls both sides back
+Isolation anomalies|A||Dirty read, non-repeatable read, phantom read and lost update, each animated
+Isolation levels|A||Same race run at Read Committed, Repeatable Read and Serializable
+Write skew|A||Two doctors both go off call because each saw the other on duty
+Locks and deadlocks|A||Two transactions wait on each other; the detector picks a victim
+Optimistic vs pessimistic concurrency|A||Version check on write vs locking up front, under low and high contention
+MVCC|A||Readers see an old row version while a writer creates a new one; vacuum cleans up
+Normalisation vs denormalisation|I||Join three tables vs read one wide row; the update anomaly that follows
+SQL vs NoSQL: choosing well|I||Decision walk-through by access pattern, consistency need and scale`},
+{stage:2,color:'blue',name:'Scaling Databases',why:'When one database is not enough: copies, splits and the problems they bring.',cap:'Shard a 10 TB user table with zero downtime and no hot spots.',L:`
+Read replicas|I|F|Writes go to the leader, reads spread across followers
+Replication lag|I||User posts a comment, refreshes, and it is gone; read-your-writes fixes it
+Sync vs async replication|A||Durability vs latency; the leader dies before followers catch up
+Leader failover and split brain|A||Leader goes quiet, a follower is promoted, the old leader comes back confused
+Multi-leader replication and conflicts|A||Two regions edit the same row; last-write-wins vs merge
+Leaderless replication and quorums|A||Writes to W nodes, reads from R nodes, R + W > N guarantees overlap
+Partitioning by range vs by hash|I||Range keeps order but piles up on hot ranges; hash spreads evenly
+Consistent hashing|A||Keys on a ring; add a node and only a slice of keys move; virtual nodes even it out
+Rebalancing partitions|A||Data streams to a new node while traffic continues
+Hot keys and the celebrity problem|A||One celebrity's posts melt one shard; key splitting and caching
+Secondary indexes on sharded data|A||Local indexes need scatter-gather; global indexes need async updates
+Distributed transactions and two-phase commit|A||Coordinator asks prepare, then commit; it crashes in the middle
+Sagas|A||Booking flight, hotel and car; a failure triggers compensating steps in reverse`},
+{stage:2,color:'green',name:'Beyond SQL: Data Store Families',why:'The right store for each shape of data, and how each one works underneath.',cap:'Pick and justify the stores for an e-commerce site: catalogue, cart, search, orders and analytics.',L:`
+Key-value stores|I|F|Get and put by key; partition key decides the node
+Document stores|I||JSON documents, embedded vs referenced, indexes on nested fields
+Wide-column stores (Cassandra-style)|A||Partition key picks the node on the ring, clustering key sorts rows inside it
+Search engines and inverted indexes|A||Text is tokenised, terms point to documents, results ranked by relevance
+Time-series databases|I||Metrics arrive in time order, compress by chunk, downsample old data
+Graph databases|I||Friends-of-friends query hops edges instead of joining tables
+Vector databases|A||Text becomes embeddings; nearest-neighbour search walks an HNSW graph
+Object storage (S3-style)|I||Buckets and keys, multipart upload, erasure coding spreads chunks across disks
+Data warehouses and lakes|A||Nightly loads vs streaming ingestion; star schema; columnar scans`},
+{stage:3,color:'orange',name:'Caching & Redis',why:'Make reads instant and understand exactly what Redis does with each command.',cap:'Your homepage cache expires and the database falls over. Stop the stampede.',L:`
+Why caching works|B|F|Hit vs miss timings; hit ratio slider shows the database load dropping
+Cache-aside, read-through, write-through and write-back|I||Four patterns animated on the same read and write
+TTL and invalidation|I||Stale price shown after an update; delete-on-write vs short TTL
+Eviction policies: LRU and LFU|I||Cache fills up and the least recently or least frequently used keys get evicted
+Cache stampede|A||Hot key expires, 1,000 requests miss at once; locking and early refresh fix it
+Cache penetration and avalanche|A||Lookups for keys that never exist; mass expiry at midnight; jittered TTLs
+Redis single-threaded event loop|A||One thread serves thousands of sockets via epoll; one slow command blocks everyone
+Redis data structures inside|A||Strings, hashes, lists, sets and a sorted set's skip list, each drawn in memory
+Redis persistence: RDB vs AOF|A||Snapshot fork vs append-only log; what survives a crash
+Redis replication and Sentinel|A||Replica follows the primary; Sentinel votes and promotes on failure
+Redis Cluster and hash slots|A||16,384 slots across nodes; a MOVED redirect when the client asks the wrong node
+Redis recipes|I||Leaderboard with a sorted set, rate limiter with INCR, session store with TTL
+Distributed locks with Redis|A||SET NX with expiry; a GC pause makes two holders; fencing tokens fix it
+Pub/Sub and Streams|A||Fire-and-forget fan-out vs a persistent stream with consumer groups`},
+{stage:3,color:'yellow',name:'Queues, Streams & Async Work',why:'Do slow work later, absorb spikes and connect services without tight coupling.',cap:'Build the order pipeline for flash-sale traffic: no lost orders, no double charges.',L:`
+Why go async|B|F|Signup waits for email, image resize and analytics; a queue makes it instant
+Message queues|I||Producer, broker, consumer; acks and redelivery when a consumer crashes
+Delivery guarantees|A||At-most-once loses messages, at-least-once duplicates them, exactly-once is a trade-off
+Idempotent consumers|A||The same message processed twice changes nothing the second time
+Dead-letter queues and poison messages|I||A bad message fails five times and is parked for inspection
+Kafka: the log|A||Append-only partitions, offsets, consumers reading at their own pace
+Kafka consumer groups and rebalancing|A||Partitions split among consumers; one joins and partitions move
+Kafka replication and ISR|A||Leader and followers per partition; acks=all and the in-sync replica set
+Ordering guarantees|A||Order kept within a partition, lost across them; choosing the key
+Backpressure|A||Consumers fall behind; lag grows; throttling and buffering upstream
+Fan-out: pub/sub topics|I||One event delivered to email, push and analytics services in parallel
+Event-driven architecture|A||Services react to events instead of calling each other
+Event sourcing and CQRS|A||State rebuilt by replaying events; separate read models for queries
+Transactional outbox and CDC|A||Write to the database and publish the event without losing either
+Stream processing|A||Windows, watermarks and late events in a real-time click counter
+Batch processing and MapReduce|A||Map, shuffle and reduce over a word count across many machines
+Job scheduling at scale|I||Cron on one box vs a distributed scheduler with leases`},
+{stage:4,color:'purple',name:'Distributed Systems Theory',why:'The ideas behind every distributed database, lock and cluster. Senior interviews go here.',cap:'Design a configuration service that stays correct when nodes crash and networks split.',L:`
+Why distributed systems are hard|I|F|The eight fallacies, each one breaking a toy system
+Network partitions|I||The link between two data centres is cut; both sides keep taking writes
+CAP theorem, properly|A||During a partition choose: refuse writes (CP) or accept and diverge (AP)
+PACELC|A||Even without a partition, every read pays latency or risks stale data
+Consistency models|A||Linearizable, sequential, causal and eventual on one timeline
+Clocks and time|A||Clocks drift; NTP corrects them; why timestamps cannot order events
+Lamport and vector clocks|A||Logical counters order events; vector clocks spot concurrent writes
+Failure detection and gossip|A||Heartbeats and suspicion; rumours spread across 100 nodes in a few rounds
+Leader election|A||Nodes vote with terms; a stale leader is ignored
+Raft consensus|A||Log entries replicate, commit on majority, survive leader crashes
+Paxos intuition|A||Proposers and acceptors agree on one value despite failures
+Coordination services (ZooKeeper, etcd)|A||Watches, ephemeral nodes and leases used for locks and config
+Unique ID generation|I||UUIDs, database sequences and Snowflake IDs with time, machine and counter bits
+CRDTs|A||Two offline replicas merge without conflict: counters, sets and text`},
+{stage:5,color:'green',name:'Reliability & Resilience',why:'Systems fail all the time. Build ones that bend instead of break.',cap:'A downstream service starts timing out. Stop the failure from spreading to your whole system.',L:`
+Failure is normal|B|F|Disks, servers, networks and humans fail at known rates; the maths of nines
+Timeouts|I||A call with no timeout ties up every thread in the pool
+Retries with exponential backoff and jitter|I||Retries in lockstep hammer a recovering service; jitter spreads them out
+Circuit breakers|I||Closed, open and half-open states driven by error rate
+Bulkheads|A||Separate pools so one slow dependency cannot sink the whole ship
+Rate limiting algorithms|I||Token bucket, leaky bucket, fixed window and sliding window on the same burst
+Load shedding and graceful degradation|A||At overload drop low-priority work; show a simpler page instead of an error
+Redundancy and single points of failure|I||Find the one box whose failure takes everything down
+Disaster recovery: RPO and RTO|A||Backups, standby regions and how much data you can afford to lose
+Chaos engineering|A||Kill random instances in a controlled way and watch the system heal`},
+{stage:5,color:'blue',name:'Microservices & Architecture',why:'How large systems are split into services and kept manageable.',cap:'Break a monolith into services without a big-bang rewrite.',L:`
+Monolith vs microservices|I|F|One deployable vs many; team size, deploy speed and failure blast radius
+Service discovery|I||Services register; clients look up healthy instances
+Sync vs async between services|I||Chain of calls multiplies latency and failure; events decouple
+Data ownership per service|A||No shared database; each service owns its tables and publishes changes
+Backend for frontend|I||Mobile and web get tailored gateways
+Service mesh and sidecars|A||A proxy beside each service handles retries, TLS and metrics
+Distributed tracing|I||One request's spans across ten services in a waterfall
+Configuration and feature flags|I||Flip a flag and behaviour changes without a deploy
+Strangler fig migration|A||New service takes routes from the monolith one at a time
+Multi-tenancy|A||Shared tables, schema per tenant or database per tenant; noisy neighbours`},
+{stage:5,color:'purple',name:'Containers & Kubernetes',why:'What actually happens inside a cluster when you deploy, scale or crash.',cap:'Roll out a bad release, catch it with probes and roll back automatically.',L:`
+VMs vs containers|B|F|Hypervisor with guest OSes vs namespaces and cgroups on one kernel
+Images and layers|I||Dockerfile steps become cached layers; a change rebuilds from that layer down
+Kubernetes architecture|I||API server, etcd, scheduler, controllers and kubelets talking
+Pods|I||Containers sharing a network and volumes; the pod lifecycle
+Deployments and ReplicaSets|I||Desired state 3 pods; one dies; the controller makes a new one
+Rolling updates and rollbacks|I||Pods replaced one at a time; a failed version is rolled back
+Services and kube-proxy|A||Stable virtual IP spreading traffic to changing pod IPs
+Ingress|I||One entry point routes by host and path to services
+Liveness and readiness probes|I||A pod that is up but not ready gets no traffic; a stuck pod is restarted
+Resource requests, limits and OOMKill|A||Scheduler packs pods by requests; a memory spike kills one
+Horizontal pod autoscaling|I||CPU rises, replicas increase, then settle
+Scheduling: affinity and taints|A||Pods steered to GPU nodes and kept off others
+StatefulSets and persistent volumes|A||Databases on Kubernetes keep their identity and disk across restarts
+ConfigMaps and Secrets|I||Config injected as env vars or files; rotating a secret`},
+{stage:5,color:'yellow',name:'Observability & Delivery',why:'Know what your system is doing and ship changes safely.',cap:'p99 latency doubled after a deploy. Use metrics, logs and traces to find the cause.',L:`
+Logs, metrics and traces|B|F|Same incident seen through each of the three lenses
+Percentiles: why averages lie|I||Average looks fine while 1 in 100 users waits 4 seconds
+SLIs, SLOs, SLAs and error budgets|I||Budget burns down during an outage; deploys freeze when it runs out
+Alerting that does not cry wolf|I||Symptom-based alerts vs noisy cause-based alerts
+Blue-green and canary deployments|I||1% of traffic to the new version, metrics compared, then full rollout
+CI/CD pipelines|B||Commit to build, test, stage and production with gates`},
+{stage:5,color:'pink',name:'Security by Design',why:'The security questions every design review and interview asks.',cap:'Secure a public API that handles payments.',L:`
+Authentication vs authorisation|B|F|Who you are vs what you may do, checked at different layers
+Password storage|I||Plain text vs hash vs salted slow hash under a stolen-database attack
+Encryption in transit and at rest|I||TLS on the wire, keys in a KMS, envelope encryption
+Role- and attribute-based access control|I||Users, roles and permissions; a policy decision for each request
+Secrets management|I||Secrets out of code, into a vault, rotated on a schedule
+DDoS protection and WAFs|A||Flood absorbed at the edge; bad patterns filtered before reaching servers
+Common attacks: injection, XSS, CSRF|I||Each attack animated, then the fix
+Zero trust networking|A||Every service call authenticated, even inside the network`},
+{stage:6,color:'orange',name:'The System Design Interview',why:'Exactly how the round works and how you are scored.',cap:'Full mock: 45 minutes on a URL shortener, scored with the rubric.',L:`
+What the round is and how it is scored|B|F|The interviewer's rubric revealed, signal by signal
+The four-step framework|B|F|Requirements, estimates, high-level design, deep dive on a clock
+Functional vs non-functional requirements|B|F|Turning a vague prompt into a short, sharp list
+Defining the API in the interview|I||From requirements to five endpoints in five minutes
+Data model and storage choice|I||Entities, access patterns, then the database that fits
+Drawing the high-level diagram|I||Build the box-and-arrow picture in the order interviewers expect
+Choosing your deep dives|I||Find the hardest part of the problem and go there
+Talking about trade-offs|I||Every choice framed as gain, cost and when you would switch
+Junior vs senior vs staff expectations|A||The same question answered at three levels
+Common mistakes|I||Jumping to solutions, over-engineering, silent drawing
+Time management in 45 minutes|I||A clock overlay on a model interview`},
+{stage:7,color:'blue',name:'Case Studies',why:'Real systems designed start to finish, each with an animated architecture you can stress.',cap:'Pick any unseen prompt and design it in a timed sandbox session.',L:`
+URL shortener|B|F|ID generation, redirect path, cache, analytics counting
+Pastebin|B||Blob storage, expiry, read-heavy caching
+Rate limiter as a service|I||Token buckets in Redis shared across many gateways
+Unique ID generator|I||Snowflake service across data centres without collisions
+Key-value store|A||Partitioning, replication, quorums and repair
+Web crawler|I||URL frontier, politeness, dedupe with Bloom filters
+Notification system|I||Push, SMS and email fan-out with retries and user preferences
+News feed|A||Fan-out on write vs on read; the celebrity exception
+Chat app|A||WebSocket gateways, message ordering, delivery receipts, offline sync
+Search autocomplete|I||Trie with top-k at each node; updates from query logs
+Video platform|A||Upload, transcode, adaptive bitrate streaming, CDN
+File sync (Dropbox-style)|A||Chunking, deduplication and conflict handling across devices
+Ride sharing|A||Driver locations with geohashes; matching riders in real time
+Nearby places|I||Quadtree vs geohash lookups for "restaurants near me"
+Ticket booking|A||Seat holds with expiry; no double-selling under huge spikes
+Payment system|A||Double-entry ledger, idempotency keys and reconciliation
+Stock exchange|A||Order book and matching engine with microsecond latency
+Photo sharing|I||Upload pipeline, feed and storage tiers
+Trending topics and top-K|A||Count-min sketch and sliding windows over a firehose
+Distributed cache|A||Consistent hashing, replication and eviction at scale
+Distributed message queue|A||Building a Kafka-like log from scratch
+Collaborative editor|A||Operational transforms vs CRDTs with live cursors
+Video conferencing|A||SFU vs MCU routing of media streams
+Leaderboard|I||Sorted sets, sharding by score range, real-time rank
+Ad click aggregation|A||Exactly-once counting with stream processing and reconciliation
+Hotel reservation|I||Inventory per night, overbooking rules, consistency
+Email service|A||Send pipeline, spam filtering, mailbox storage and search
+Metrics and monitoring system|A||Ingest millions of points per second; time-series storage and alerting
+AI chat assistant|A||Streaming tokens, GPU queues, context storage and rate limits
+Global CDN|A||Edge placement, routing, cache hierarchy and invalidation`},
+{stage:7,color:'green',name:'Mastery Labs',why:'Practice until it is second nature. This is what people pay for.',cap:'Earn the Mastery certificate: pass three labs and two timed mock interviews.',L:`
+Design sandbox|I||Drag components onto a canvas, send simulated traffic and watch bottlenecks glow
+Scale challenges|A||Your design must survive 10×, then 100× traffic; fix what breaks
+Incident drills|A||A live system misbehaves; read the dashboards and find the cause
+Estimation speed runs|I||Timed napkin-math rounds with instant feedback
+Trade-off duels|A||Two designs, one requirement; argue which wins and why
+Spaced review deck|B||Daily cards from every lesson you finished
+Timed mock interviews|A||45-minute rounds with a rubric, model answer and AI feedback
+Architecture teardown library|A||Annotated walk-throughs of famous engineering blog posts`},
+];
+
+const COLORS = { blue:['#e0ecf9','#a7c3e7'], purple:['#f3ebfa','#c9b8e5'], green:['#e3f2d8','#b0d59c'], orange:['#fee7cf','#f2b27c'], yellow:['#fff4d8','#f5cb7f'], pink:['#fbe9ef','#e8a9bd'] };
+const LV = { B:'Beginner', I:'Intermediate', A:'Advanced' };
+
+// parse + numbering; first lesson of every track is free
+let total = 0;
+TRACKS.forEach((t, ti) => {
+  t.id = ti + 1;
+  t.lessons = t.L.trim().split('\n').map((ln, i) => {
+    const [title, lv, fr, scene] = ln.split('|');
+    total++;
+    return { title, lv, free: fr === 'F' || i === 0, scene, code: `${t.id}.${i + 1}` };
+  });
+});
+const all = TRACKS.flatMap(t => t.lessons);
+const freeN = all.filter(l => l.free).length;
+const hours = Math.round((total * 12 + TRACKS.length * 30) / 60);
+document.getElementById('stats').innerHTML = [
+  ['Tracks', TRACKS.length], ['Lessons', total], ['Free', freeN], ['Pro', total - freeN], ['Checkpoints', TRACKS.length], ['Hours', '~' + hours],
+].map(([k, v]) => `<div class="stat"><small>${k}</small><b>${v}</b></div>`).join('');
+
+function cube(c) {
+  const [top, side] = COLORS[c];
+  return `<svg class="tico" viewBox="0 0 60 60" aria-hidden="true">
+    <ellipse cx="30" cy="52" rx="20" ry="5" fill="#6b5236" opacity=".18"/>
+    <path d="M30 8 Q32 7 34 8 L50 16 Q52 17 52 19 L52 38 Q52 40 50 41 L32 50 Q30 51 28 50 L10 41 Q8 40 8 38 L8 19 Q8 17 10 16 L26 8 Q28 7 30 8Z" fill="${side}"/>
+    <path d="M30 29.5 L52 19 L52 38 Q52 40 50 41 L32 50 Q30 51 30 49Z" fill="#3a2a14" opacity=".07"/>
+    <path d="M28 8 Q30 7 32 8 L50 17 Q52 18 50 19 L32 28 Q30 29 28 28 L10 19 Q8 18 10 17Z" fill="${top}"/>
+    <path d="M11 19.6 L28 28.6 Q30 29.6 32 28.6 L49 19.6" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M30 8 Q32 7 34 8 L50 16 Q52 17 52 19 L52 38 Q52 40 50 41 L32 50 Q30 51 28 50 L10 41 Q8 40 8 38 L8 19 Q8 17 10 16 L26 8 Q28 7 30 8Z" fill="none" stroke="#3b3631" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>`;
+}
+const esc = s => s.replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+
+const state = { acc: 'all', lv: 'all', q: '', stage: null };
+let openSet = new Set([1]);
+
+function render() {
+  const q = state.q.toLowerCase();
+  let shown = 0;
+  const html = TRACKS.map(t => {
+    if (state.stage !== null && t.stage !== state.stage) return '';
+    const ls = t.lessons.filter(l =>
+      (state.acc === 'all' || (state.acc === 'free') === l.free) &&
+      (state.lv === 'all' || l.lv === state.lv) &&
+      (!q || (l.title + ' ' + l.scene + ' ' + t.name).toLowerCase().includes(q)));
+    if (!ls.length) return '';
+    shown += ls.length;
+    const free = t.lessons.filter(l => l.free).length;
+    const open = openSet.has(t.id) || !!q;
+    return `<details class="track" data-id="${t.id}" ${open ? 'open' : ''}>
+      <summary>${cube(t.color)}
+        <div class="thead"><small>Track ${t.id} · ${STAGES[t.stage][0]}</small><h3>${esc(t.name)}</h3><p>${esc(t.why)}</p></div>
+        <div class="tmeta"><span>${t.lessons.length} lessons · ${free} free</span><span class="chev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1d1b18" stroke-width="3" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+      </summary>
+      <ol class="lessons">${ls.map(l => `<li class="lesson"><span class="num">${l.code}</span>
+        <div><div class="lt">${esc(l.title)}</div><div class="ls">${esc(l.scene)}</div></div>
+        <div class="tags"><span class="tag lv${l.lv}">${LV[l.lv]}</span><span class="tag ${l.free ? 'free' : 'pro'}">${l.free ? 'Free' : 'Pro'}</span></div></li>`).join('')}</ol>
+      <div class="cap"><span class="num" style="color:var(--ink)">★</span><div><b>Checkpoint:</b> ${esc(t.cap)}</div></div>
+    </details>`;
+  }).join('');
+  const box = document.getElementById('tracks');
+  box.innerHTML = html || '<div class="empty panel">No lessons match. Clear the search or filters.</div>';
+  box.querySelectorAll('details.track').forEach(d => d.addEventListener('toggle', () => {
+    const id = +d.dataset.id; d.open ? openSet.add(id) : openSet.delete(id); syncToggle();
+  }));
+  document.getElementById('count').textContent = `${shown} of ${total} lessons`;
+  syncToggle();
+}
+function syncToggle() {
+  const ds = [...document.querySelectorAll('details.track')];
+  document.getElementById('toggleAll').textContent = ds.length && ds.every(d => d.open) ? 'Collapse all' : 'Expand all';
+}
+
+document.getElementById('stages').innerHTML = STAGES.map(([n, s], i) => {
+  const c = TRACKS.filter(t => t.stage === i).reduce((a, t) => a + t.lessons.length, 0);
+  return `<button class="stage" data-st="${i}" aria-pressed="false"><small>STAGE ${i + 1}</small><b>${n}</b><span>${s} · ${c}</span></button>`;
+}).join('');
+document.querySelectorAll('.stage').forEach(b => b.addEventListener('click', () => {
+  const i = +b.dataset.st; state.stage = state.stage === i ? null : i;
+  document.querySelectorAll('.stage').forEach(x => x.setAttribute('aria-pressed', String(+x.dataset.st === state.stage)));
+  render();
+}));
+document.querySelectorAll('[data-acc]').forEach(b => b.addEventListener('click', () => {
+  state.acc = b.dataset.acc; document.querySelectorAll('[data-acc]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); render();
+}));
+document.querySelectorAll('[data-lv]').forEach(b => b.addEventListener('click', () => {
+  state.lv = b.dataset.lv; document.querySelectorAll('[data-lv]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); render();
+}));
+document.getElementById('q').addEventListener('input', e => { state.q = e.target.value.trim(); render(); });
+document.getElementById('toggleAll').addEventListener('click', () => {
+  const ds = [...document.querySelectorAll('details.track')], openAll = !ds.every(d => d.open);
+  openSet = new Set(openAll ? TRACKS.map(t => t.id) : []); render();
+});
+render();
+</script>

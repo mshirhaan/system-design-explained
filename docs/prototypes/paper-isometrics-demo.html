@@ -1,0 +1,647 @@
+<title>Paper Isometrics</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: one warm paper sheet. Isometric stage card + narration rail on top, the style kit (blocks, palette, recipe) below. */
+:root{
+  --paper:#f4ebe0; --sheet:#f9f2e8; --card:#f6eee3; --line:#ddd3c5; --line-soft:#e6ddd0;
+  --ink:#1d1b18; --ink-2:#34302b; --muted:#6f6961;
+  --green:#cfe3b2; --violet:#e7ddf5; --violet-line:#d5c8e2; --orange:#fcdcbd; --yellow:#fee7b8; --blue:#d6e5f6;
+  --font:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --pop:1.5px 2.5px 0 var(--ink);
+  color-scheme:light;
+}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--font);font-size:13px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 56px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:18px}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.01em}
+.brand mark{background:var(--green);color:inherit;padding:0 5px;border-radius:4px}
+.tabs,.ctrls{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;font-size:12.5px;color:var(--ink);background:var(--sheet);border:1.5px solid var(--ink);
+  border-radius:10px;padding:6px 12px;box-shadow:var(--pop);cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  transition:transform .12s ease,box-shadow .12s ease,background .15s}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:2.5px 3.5px 0 var(--ink)}
+.btn:active{transform:translate(1.5px,2.5px);box-shadow:0 0 0 var(--ink)}
+.btn[aria-pressed="true"]{background:var(--green)}
+.btn:focus-visible{outline:2px solid #5a43a6;outline-offset:3px}
+.btn svg{width:15px;height:15px}
+kbd{font:inherit;font-size:10.5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:var(--sheet);color:var(--muted)}
+
+.panel{background:var(--sheet);border:1px solid var(--line);border-radius:14px;box-shadow:inset 0 1px 0 #ffffffa0,0 1px 0 var(--line)}
+.board{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px}
+@media (max-width:920px){.board{grid-template-columns:1fr}}
+.stage{padding:14px;display:grid;gap:10px;min-width:0}
+.stage-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.metrics{display:flex;gap:8px;flex-wrap:wrap}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:5px 11px;min-width:124px}
+.metric small{display:block;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.metric b{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+.metric b.flash{animation:value-in .5s ease}
+.scroller{overflow-x:auto;border-radius:10px}
+.scroller svg{display:block;width:100%;min-width:640px;height:auto}
+#kitSvg{max-width:900px;margin:0 auto}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.dot{width:11px;height:11px;border-radius:50%;border:1.4px solid var(--ink);display:inline-block}
+.sq{width:11px;height:11px;border-radius:3px;border:1.4px solid var(--ink);display:inline-block}
+
+.narr{padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.narr-top{display:flex;justify-content:space-between;align-items:center}
+.eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.tag{font-size:10.5px;font-weight:800;letter-spacing:.06em;border:1.5px solid var(--ink);border-radius:999px;padding:1px 9px;background:var(--violet);box-shadow:1px 1.5px 0 var(--ink)}
+.narr h2{font-size:19px;line-height:1.3;margin:0;text-wrap:balance}
+.narr p{margin:0;color:var(--ink-2)}
+.fade{animation:fresh-in .35s ease}
+.key{display:flex;gap:10px;background:var(--violet);border:1px solid var(--violet-line);border-radius:10px;padding:12px}
+.key small{font-size:9.5px;letter-spacing:.1em;font-weight:700;color:var(--muted)}
+.key p{font-size:12px;line-height:1.55}
+.key-ico{flex:none;width:26px;height:26px;border:1.5px solid var(--ink);border-radius:7px;background:var(--sheet);display:grid;place-items:center}
+.steps{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:2px;border-top:1px dashed var(--line);padding-top:12px}
+.steps li{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--muted);padding:3px 0}
+.steps li i{font-style:normal;width:22px;height:22px;flex:none;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:10.5px;font-weight:700;background:var(--sheet)}
+.steps li.done i{border-color:var(--ink);background:var(--card)}
+.steps li.now{color:var(--ink);font-weight:700}
+.steps li.now i{border-color:var(--ink);background:var(--green);box-shadow:1px 1.5px 0 var(--ink)}
+.hint{font-size:10.5px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:auto}
+
+.kit{padding:20px;display:grid;gap:18px}
+.kit h2{margin:0;font-size:18px}
+.kit .sub{margin:2px 0 0;color:var(--muted);max-width:68ch}
+.kit-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:22px}
+@media (max-width:860px){.kit-grid{grid-template-columns:1fr}}
+.kit h3{font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 10px}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px}
+.sw{border:1.5px solid var(--ink);border-radius:10px;overflow:hidden;box-shadow:var(--pop);background:var(--sheet)}
+.sw div{height:38px;border-bottom:1.5px solid var(--ink)}
+.sw p{margin:0;padding:5px 8px;font-size:11px;line-height:1.35}
+.sw p span{color:var(--muted)}
+.recipe{margin:0;padding:0;list-style:none;display:grid;gap:9px}
+.recipe li{display:grid;grid-template-columns:22px 1fr;gap:8px;font-size:12.5px;color:var(--ink-2)}
+.recipe li b{color:var(--ink)}
+.recipe li::before{content:"";width:12px;height:12px;margin-top:4px;border:1.5px solid var(--ink);border-radius:3px;background:var(--green);transform:rotate(45deg) scaleY(.85)}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.chip{border:1.5px solid var(--ink);border-radius:999px;padding:3px 12px;font-weight:600;font-size:12px;box-shadow:var(--pop);background:var(--sheet)}
+code{background:var(--card);border:1px solid var(--line);border-radius:5px;padding:0 4px;font-size:11.5px}
+
+/* SVG text + motion */
+.st{font-family:var(--font);fill:var(--ink)}
+.pop{transform-box:fill-box;transform-origin:center;animation:pop .5s cubic-bezier(.3,1.7,.5,1) both}
+.out{transition:opacity .25s;opacity:0}
+.burst{transform-box:fill-box;transform-origin:center;animation:burst .6s ease-out forwards}
+.held{animation:held 1.4s ease-in-out infinite}
+.bub-new{transform-box:fill-box;transform-origin:left center;animation:pop .5s cubic-bezier(.3,1.7,.5,1) both}
+.float{animation:float 3.6s ease-in-out infinite}
+@keyframes pop{0%{transform:scale(.55);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes burst{0%{transform:scale(.4);opacity:.9}100%{transform:scale(3);opacity:0}}
+@keyframes held{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes value-in{0%{background:var(--yellow)}100%{background:transparent}}
+@keyframes fresh-in{0%{opacity:0;transform:translateY(4px)}100%{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.pop,.burst,.bub-new,.fade,.float,.held{animation:none}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs"></defs></svg>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 4 L28 10 L16 16 L4 10 Z" fill="#cde0f5" stroke="#1d1b18" stroke-width="1.7" stroke-linejoin="round"/>
+        <path d="M4 10 L16 16 L16 28 L4 22 Z" fill="#bcd3ef" stroke="#1d1b18" stroke-width="1.7" stroke-linejoin="round"/>
+        <path d="M16 16 L28 10 L28 22 L16 28 Z" fill="#a9c5e8" stroke="#1d1b18" stroke-width="1.7" stroke-linejoin="round"/>
+      </svg>
+      <span>Paper <mark>Isometrics</mark></span>
+    </div>
+    <nav class="tabs" aria-label="Scene">
+      <button class="btn" id="tab-polling" aria-pressed="true">Polling</button>
+      <button class="btn" id="tab-long" aria-pressed="false">Long polling</button>
+      <button class="btn" id="tab-ws" aria-pressed="false">WebSocket</button>
+    </nav>
+  </header>
+
+  <section class="board">
+    <div class="panel stage">
+      <div class="stage-top">
+        <div class="metrics">
+          <div class="metric"><small>Requests sent</small><b id="m-req">0</b></div>
+          <div class="metric"><small>Empty replies</small><b id="m-empty">0</b></div>
+          <div class="metric"><small>Message delay</small><b id="m-delay">—</b></div>
+        </div>
+        <div class="ctrls">
+          <button class="btn" id="replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Replay</button>
+          <button class="btn" id="pause"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span>Pause</span></button>
+        </div>
+      </div>
+      <div class="scroller">
+        <svg id="stage" viewBox="-460 -200 920 570" role="img" aria-label="Isometric scene: Alice and Bob's phones talking through a chat server">
+          <rect x="-460" y="-200" width="920" height="570" fill="url(#iso-grid)" mask="url(#grid-mask)"/>
+          <g id="L-links"></g><g id="L-ents"></g><g id="L-packets"></g><g id="L-fx"></g><g id="L-pills"></g>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:#fbf6ef"></i>empty response</span>
+        <span><i class="dot" style="background:#f6b98a"></i>request</span>
+        <span><i class="dot" style="background:#a6d38b"></i>response</span>
+        <span><i class="sq" style="background:#f6cd82"></i>message</span>
+        <span><i class="dot" style="background:transparent;border:2.4px solid #3fa456"></i>heartbeat</span>
+      </div>
+    </div>
+
+    <aside class="panel narr" aria-live="polite">
+      <div class="narr-top"><span class="eyebrow" id="stepNo">Step 1 / 5</span><span class="tag" id="modeTag">HTTP</span></div>
+      <div id="stepText" class="fade" style="display:grid;gap:8px">
+        <h2 id="stepTitle">Alice asks the server</h2>
+        <p id="stepBody"></p>
+      </div>
+      <div class="key">
+        <span class="key-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1d1b18" stroke-width="2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/></svg></span>
+        <div><small>KEY IDEA</small><p id="keyIdea"></p></div>
+      </div>
+      <ol class="steps" id="stepList"></ol>
+      <div class="hint"><kbd>Space</kbd> pause · <kbd>R</kbd> replay · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> scenes</div>
+    </aside>
+  </section>
+
+  <section class="panel kit">
+    <div>
+      <h2>The kit behind it</h2>
+      <p class="sub">Every object above comes from four drawing functions: a rounded isometric box, a cylinder, a standing device and a pill label. Change the size and the colour name and you get the whole set.</p>
+    </div>
+    <div class="scroller">
+      <svg id="kitSvg" viewBox="0 0 1000 290" role="img" aria-label="Kit pieces: slab, three cubes, a database cylinder and a phone">
+        <rect x="0" y="0" width="1000" height="290" fill="url(#iso-grid)" mask="url(#grid-mask)"/>
+      </svg>
+    </div>
+    <div class="kit-grid">
+      <div>
+        <h3>Palette</h3>
+        <div class="swatches" id="swatches"></div>
+        <h3 style="margin-top:20px">Labels</h3>
+        <div class="chips">
+          <span class="chip">pill label</span>
+          <span class="chip" style="background:var(--violet)">1 new message</span>
+          <span class="chip" style="background:var(--green)">active tab</span>
+          <span class="chip" style="background:var(--orange)">warning</span>
+        </div>
+      </div>
+      <div>
+        <h3>Recipe</h3>
+        <ul class="recipe">
+          <li><span><b>2:1 isometric projection.</b> A world point (X, Y, Z) lands on screen at <code>x = X − Y</code>, <code>y = (X + Y)/2 − Z</code>. Every top face is a diamond twice as wide as it is tall.</span></li>
+          <li><span><b>No sharp corners.</b> Each polygon vertex becomes a quadratic curve, which gives the soft, clay-like blocks.</span></li>
+          <li><span><b>Two gradients per colour.</b> A light top face, a deeper side face, and the right side shaded another 6%.</span></li>
+          <li><span><b>One outline, one highlight.</b> A 1.5px warm near-black stroke round the silhouette and a white line just under the front edge.</span></li>
+          <li><span><b>Warm blurred shadow.</b> A brown, not grey, Gaussian-blurred copy of the silhouette sits a few pixels below.</span></li>
+          <li><span><b>Hard-shadow UI.</b> Buttons and pills get a solid ink border and an unblurred offset shadow. That's the neo-brutalist half of the look.</span></li>
+          <li><span><b>Paper ground.</b> Warm off-white with a faint isometric grid that fades out towards the edges.</span></li>
+          <li><span><b>Monospace everywhere.</b> JetBrains Mono for labels, UI and body text.</span></li>
+          <li><span><b>Motion with weight.</b> Packets hop along arrows with ease-in-out; labels pop in with a small overshoot.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const INK = '#1d1b18';
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const f = n => Math.round(n * 100) / 100;
+const P = (x, y) => ({ x, y });
+function toward(p, q, d) { const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1; return P(p.x + dx / L * d, p.y + dy / L * d); }
+
+/* Rounded polygon: every vertex becomes a quadratic curve. r can be a number or an array per vertex. */
+function rounded(pts, r, closed = true) {
+  let d = ''; const n = pts.length;
+  for (let i = 0; i < n; i++) {
+    const p = pts[i], ri = Array.isArray(r) ? r[i] : r;
+    if ((!closed && (i === 0 || i === n - 1)) || !ri) { d += (i ? 'L' : 'M') + f(p.x) + ',' + f(p.y) + ' '; continue; }
+    const a = pts[(i - 1 + n) % n], b = pts[(i + 1) % n];
+    const p1 = toward(p, a, Math.min(ri, Math.hypot(a.x - p.x, a.y - p.y) / 2));
+    const p2 = toward(p, b, Math.min(ri, Math.hypot(b.x - p.x, b.y - p.y) / 2));
+    d += (i ? 'L' : 'M') + f(p1.x) + ',' + f(p1.y) + ' Q' + f(p.x) + ',' + f(p.y) + ' ' + f(p2.x) + ',' + f(p2.y) + ' ';
+  }
+  return d + (closed ? 'Z' : '');
+}
+
+/* ---------- shared defs ---------- */
+const COLORS = {
+  slab:   { top: ['#f8f1e8', '#efe6da'], side: ['#ece2d5', '#e1d5c5'] },
+  blue:   { top: ['#e0ecf9', '#cbdff4'], side: ['#bcd3ef', '#a7c3e7'] },
+  purple: { top: ['#f3ebfa', '#e5daf3'], side: ['#d9cbef', '#c9b8e5'] },
+  green:  { top: ['#e3f2d8', '#d0e8c0'], side: ['#c2e0b1', '#b0d59c'] },
+  orange: { top: ['#fee7cf', '#fcd3ab'], side: ['#f9c697', '#f2b27c'] },
+  yellow: { top: ['#fff4d8', '#fee6b6'], side: ['#fcda9a', '#f5cb7f'] },
+};
+(function buildDefs() {
+  const defs = document.getElementById('defs');
+  for (const [name, c] of Object.entries(COLORS)) {
+    const t = el('linearGradient', { id: `g-${name}-top`, x1: 0, y1: 0, x2: .35, y2: 1 }, defs);
+    el('stop', { offset: 0, 'stop-color': c.top[0] }, t); el('stop', { offset: 1, 'stop-color': c.top[1] }, t);
+    const s = el('linearGradient', { id: `g-${name}-side`, x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+    el('stop', { offset: 0, 'stop-color': c.side[0] }, s); el('stop', { offset: 1, 'stop-color': c.side[1] }, s);
+  }
+  const blur = (id, sd) => { const fl = el('filter', { id, x: '-40%', y: '-40%', width: '180%', height: '180%' }, defs); el('feGaussianBlur', { stdDeviation: sd }, fl); };
+  blur('blur-sm', 2.2); blur('blur-lg', 6.5);
+  const mk = (id, color) => { const m = el('marker', { id, viewBox: '0 0 10 10', refX: 8.6, refY: 5, markerWidth: 5.2, markerHeight: 5.2, orient: 'auto-start-reverse', markerUnits: 'strokeWidth' }, defs);
+    el('path', { d: 'M1,1.2 L9,5 L1,8.8 Z', fill: color, stroke: color, 'stroke-linejoin': 'round' }, m); };
+  mk('arrow', INK); mk('arrow-muted', '#a59c90'); mk('arrow-green', '#3f8f4e');
+  const pat = el('pattern', { id: 'iso-grid', patternUnits: 'userSpaceOnUse', x: 0, y: -7, width: 28, height: 14 }, defs);
+  el('path', { d: 'M0 7 L14 0 L28 7 L14 14 Z', fill: 'none', stroke: '#a8916f', 'stroke-opacity': .32, 'stroke-width': .8 }, pat);
+  const rg = el('radialGradient', { id: 'grid-fade' }, defs);
+  [[0, 1], [.45, .9], [.8, .3], [1, 0]].forEach(([o, a]) => el('stop', { offset: o, 'stop-color': '#fff', 'stop-opacity': a }, rg));
+  const mask = el('mask', { id: 'grid-mask', maskContentUnits: 'objectBoundingBox' }, defs);
+  el('rect', { x: 0, y: 0, width: 1, height: 1, fill: 'url(#grid-fade)' }, mask);
+})();
+
+/* ---------- drawing kit ---------- */
+function box(parent, { cx, cy, w, d = w, h, r = 10, color = 'slab', edge = '#3b3631' }) {
+  const g = el('g', {}, parent);
+  const c = (X, Y, Z) => P(cx + X - Y, cy + (X + Y) / 2 - Z);
+  const hw = w / 2, hd = d / 2;
+  const T = c(-hw, -hd, h), R = c(hw, -hd, h), B = c(hw, hd, h), L = c(-hw, hd, h);
+  const Rb = c(hw, -hd, 0), Bb = c(hw, hd, 0), Lb = c(-hw, hd, 0);
+  const rs = Math.min(r, h / 2.2);
+  const sil = rounded([T, R, Rb, Bb, Lb, L], [r, rs, rs, r, rs, rs]);
+  el('path', { d: sil, transform: 'translate(0 6)', fill: '#6b5236', opacity: .22, filter: 'url(#blur-lg)' }, g);
+  el('path', { d: sil, fill: `url(#g-${color}-side)` }, g);
+  el('path', { d: rounded([B, R, Rb, Bb], [0, rs, rs, r]), fill: '#3a2a14', opacity: .06 }, g);
+  el('path', { d: rounded([T, R, B, L], r), fill: `url(#g-${color}-top)` }, g);
+  if (h > 30) el('path', { d: `M${f(B.x)},${f(B.y + r * .6)} L${f(Bb.x)},${f(Bb.y - r)}`, stroke: '#fff', 'stroke-opacity': .55, 'stroke-width': 1.4, 'stroke-linecap': 'round' }, g);
+  const hl = rounded([toward(L, B, r), B, toward(R, B, r)], [0, r, 0], false);
+  el('path', { d: hl, transform: 'translate(0 1.6)', fill: 'none', stroke: '#fff', 'stroke-opacity': .8, 'stroke-width': 1.6, 'stroke-linecap': 'round' }, g);
+  el('path', { d: hl, transform: 'translate(0 3.6)', fill: 'none', stroke: '#5a4123', 'stroke-opacity': .08, 'stroke-width': 2.4, 'stroke-linecap': 'round' }, g);
+  el('path', { d: sil, fill: 'none', stroke: edge, 'stroke-width': 1.6, 'stroke-linejoin': 'round' }, g);
+  return { g, T, R, B, L, top: P(cx, cy - h), topPlane: (u = 0, v = 0) => `matrix(1 0.5 -1 0.5 ${f(cx + u)} ${f(cy - h + v)})` };
+}
+
+function cylinder(parent, { cx, cy, rx, h, color = 'yellow' }) {
+  const g = el('g', {}, parent), ry = rx / 2, ty = cy - h;
+  el('ellipse', { cx, cy: cy + 6, rx: rx + 4, ry: ry + 2, fill: '#6b5236', opacity: .22, filter: 'url(#blur-lg)' }, g);
+  const body = `M${cx - rx},${ty} L${cx - rx},${cy} A${rx} ${ry} 0 0 0 ${cx + rx},${cy} L${cx + rx},${ty} Z`;
+  el('path', { d: body, fill: `url(#g-${color}-side)` }, g);
+  el('path', { d: `M${cx},${ty + ry} L${cx},${cy + ry} A${rx} ${ry} 0 0 0 ${cx + rx},${cy} L${cx + rx},${ty} Z`, fill: '#3a2a14', opacity: .06 }, g);
+  for (const k of [.36, .68]) el('path', { d: `M${cx - rx},${ty + h * k} A${rx} ${ry} 0 0 0 ${cx + rx},${ty + h * k}`, fill: 'none', stroke: '#3b3631', 'stroke-opacity': .35, 'stroke-width': 1.2 }, g);
+  el('path', { d: `M${cx - rx},${ty} L${cx - rx},${cy} A${rx} ${ry} 0 0 0 ${cx + rx},${cy} L${cx + rx},${ty}`, fill: 'none', stroke: '#3b3631', 'stroke-width': 1.6, 'stroke-linejoin': 'round' }, g);
+  el('ellipse', { cx, cy: ty, rx, ry, fill: `url(#g-${color}-top)`, stroke: '#3b3631', 'stroke-width': 1.6 }, g);
+  el('ellipse', { cx, cy: ty + 1.5, rx: rx * .7, ry: ry * .7, fill: 'none', stroke: '#fff', 'stroke-opacity': .7, 'stroke-width': 1.4 }, g);
+  return { g, top: P(cx, ty) };
+}
+
+/* A phone standing on a surface. Its face lies in the plane spanned by -Y (right-up) and Z (up). */
+function phone(parent, { x, y, s = 1 }) {
+  const g = el('g', { transform: `translate(${x} ${y}) scale(${s})` }, parent);
+  const W = 46, H = 84, plane = (ox, oy) => `matrix(1 -0.5 0 1 ${ox} ${oy})`;
+  el('path', { d: rounded([P(-30, 13), P(22, -13), P(30, -9), P(-22, 17)], 6), fill: '#6b5236', opacity: .3, filter: 'url(#blur-sm)' }, g);
+  const back = el('g', { transform: plane(-23 - 7, 11.5 - 3.5) }, g);
+  el('rect', { x: 0, y: -H, width: W, height: H, rx: 10, fill: '#47423d', stroke: INK, 'stroke-width': 1.5 }, back);
+  for (let i = 1; i < 7; i++) {
+    const m = el('g', { transform: plane(-23 - 7 + i, 11.5 - 3.5 + i / 2) }, g);
+    el('rect', { x: 0, y: -H, width: W, height: H, rx: 10, fill: '#4f4a44' }, m);
+  }
+  const front = el('g', { transform: plane(-23, 11.5) }, g);
+  el('rect', { x: 0, y: -H, width: W, height: H, rx: 10, fill: '#6b655e', stroke: INK, 'stroke-width': 1.5 }, front);
+  el('rect', { x: 3.6, y: -H + 4, width: W - 7.2, height: H - 8, rx: 7, fill: '#f8f3ec', stroke: INK, 'stroke-width': 1.1 }, front);
+  el('rect', { x: W / 2 - 7, y: -H + 7.5, width: 14, height: 2.6, rx: 1.3, fill: '#3b3631' }, front);
+  const bubbles = el('g', {}, front);
+  const api = { g, front, bubbles, list: [], W, H };
+  addBubble(api, 'in', '#e7ded2', false); addBubble(api, 'out', '#e7ded2', false); addBubble(api, 'in', '#e7ded2', false);
+  return api;
+}
+function addBubble(ph, side, color, animate = true) {
+  if (ph.list.length >= 4) ph.list.shift().remove();
+  const w = side === 'in' ? 25 : 21;
+  const r = el('rect', { x: side === 'in' ? 7.5 : ph.W - 7.5 - w, y: 0, width: w, height: 9, rx: 4.5, fill: color, class: animate ? 'bub-new' : '' }, ph.bubbles);
+  ph.list.push(r);
+  ph.list.forEach((b, i) => b.setAttribute('y', -ph.H + 17 + i * 15));
+}
+
+/* Pill label with a hard offset shadow. */
+const ICONS = {
+  info: g => { el('circle', { r: 7.5, fill: INK }, g); el('rect', { x: -1.2, y: -1.5, width: 2.4, height: 6, rx: 1, fill: '#fbf6ef' }, g); el('circle', { cy: -4.2, r: 1.4, fill: '#fbf6ef' }, g); },
+  user: g => { el('circle', { cy: -3.5, r: 3.6, fill: 'none', stroke: INK, 'stroke-width': 2.2 }, g); el('path', { d: 'M-6.5,7.5 Q-6.5,1 0,1 Q6.5,1 6.5,7.5 Z', fill: INK }, g); },
+  chat: g => { el('path', { d: 'M-7,-6 H7 Q8.5,-6 8.5,-4.5 V3 Q8.5,4.5 7,4.5 H-2 L-6,8 V4.5 H-7 Q-8.5,4.5 -8.5,3 V-4.5 Q-8.5,-6 -7,-6 Z', fill: '#5a43a6' }, g);
+    [-4, 0, 4].forEach(x => el('circle', { cx: x, cy: -.8, r: 1.2, fill: '#fff' }, g)); },
+  clock: g => { el('circle', { r: 7, fill: 'none', stroke: INK, 'stroke-width': 2 }, g); el('path', { d: 'M0,-3.8 V0 L2.8,2', fill: 'none', stroke: INK, 'stroke-width': 2, 'stroke-linecap': 'round' }, g); },
+  bolt: g => { el('path', { d: 'M1.5,-8 L-5,1 H0 L-1.5,8 L5,-1 H0 Z', fill: INK, 'stroke-linejoin': 'round' }, g); },
+};
+function pill(layer, x, y, text, { bg = '#fbf6ef', icon = null, size = 15, weight = 600, color = INK, float = false } = {}) {
+  const lines = String(text).split('\n');
+  const cw = size * 0.6, padX = size * .8, padY = size * .42, lineH = size * 1.32;
+  const iconW = icon ? size * 1.45 : 0;
+  const w = Math.max(...lines.map(l => l.length)) * cw + padX * 2 + iconW, h = lines.length * lineH + padY * 2;
+  const outer = el('g', { transform: `translate(${f(x)} ${f(y)})` }, layer);
+  const g = el('g', { class: 'pop' + (float ? ' float' : '') }, outer);
+  const rr = Math.min(h / 2, 16);
+  el('rect', { x: -w / 2 + 1.5, y: -h / 2 + 2.5, width: w, height: h, rx: rr, fill: INK }, g);
+  el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx: rr, fill: bg, stroke: INK, 'stroke-width': 1.7 }, g);
+  if (icon) ICONS[icon](el('g', { transform: `translate(${f(-w / 2 + padX + size * .45)} 0) scale(${size / 15})` }, g));
+  const multi = lines.length > 1 && !icon;
+  lines.forEach((l, i) => {
+    const t = el('text', { class: 'st', x: multi ? 0 : f(-w / 2 + padX + iconW), y: f(-h / 2 + padY + lineH * (i + .5)), dy: '.35em',
+      'text-anchor': multi ? 'middle' : 'start', 'font-size': size, 'font-weight': weight, fill: color }, g);
+    t.textContent = l;
+  });
+  outer.kill = () => { outer.classList.add('out'); setTimeout(() => outer.remove(), 260); };
+  return outer;
+}
+
+/* ---------- tiny animation engine with a pausable clock ---------- */
+let paused = false, clock = 0, last = performance.now();
+const tweens = new Set();
+const CANCEL = Symbol('cancel');
+let run = { dead: false };
+function frame(t) {
+  const dt = Math.min(50, t - last); last = t;
+  if (!paused) { clock += dt; for (const tw of [...tweens]) tw.tick(clock); }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+const easeIO = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+function tween(dur, fn, ease = easeIO) {
+  const token = run;
+  return new Promise((res, rej) => {
+    const start = clock;
+    const tw = {
+      token, kill() { tweens.delete(tw); rej(CANCEL); },
+      tick(c) { if (token.dead) return tw.kill(); const k = Math.min(1, (c - start) / dur); fn(ease(k)); if (k >= 1) { tweens.delete(tw); res(); } }
+    };
+    tweens.add(tw); fn(0);
+  });
+}
+const wait = ms => tween(ms, () => {});
+const alive = () => !run.dead;
+
+/* ---------- the stage ---------- */
+const $ = id => document.getElementById(id);
+const L = { links: $('L-links'), ents: $('L-ents'), packets: $('L-packets'), fx: $('L-fx'), pills: $('L-pills') };
+const POS = {
+  alice: P(-300, 236), bob: P(300, 236), server: P(0, 30),
+  A: P(-246, 150), Bp: P(246, 150), SL: P(-62, 52), SR: P(62, 52),
+};
+let S = {};
+function buildScene() {
+  Object.values(L).forEach(l => l.replaceChildren());
+  const aSlab = box(L.ents, { cx: POS.alice.x, cy: POS.alice.y, w: 96, h: 16, r: 12 });
+  const bSlab = box(L.ents, { cx: POS.bob.x, cy: POS.bob.y, w: 96, h: 16, r: 12 });
+  const srv = box(L.ents, { cx: POS.server.x, cy: POS.server.y, w: 90, h: 106, r: 16, color: 'blue' });
+  const ic = el('g', { transform: srv.topPlane(-4, 0) }, L.ents);
+  el('path', { d: 'M-15,-12 H15 Q19,-12 19,-8 V8 Q19,12 15,12 H-2 L-10,19 V12 H-15 Q-19,12 -19,8 V-8 Q-19,-12 -15,-12 Z', fill: '#f4f8fd', stroke: INK, 'stroke-width': 2.4, 'stroke-linejoin': 'round' }, ic);
+  [-8, 0, 8].forEach(x => el('circle', { cx: x, cy: 0, r: 2.2, fill: INK }, ic));
+  ['Chat', 'Server'].forEach((w, i) => { const t = el('text', { class: 'st', x: 0, y: 6 + i * 26, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 800 }, L.ents); t.textContent = w; });
+  S.alice = phone(L.ents, { x: POS.alice.x, y: POS.alice.y - 16 });
+  S.bob = phone(L.ents, { x: POS.bob.x, y: POS.bob.y - 16 });
+  pill(L.ents, POS.alice.x, 340, 'Alice', { icon: 'user', size: 17, weight: 700 });
+  pill(L.ents, POS.bob.x, 340, 'Bob', { icon: 'user', size: 17, weight: 700 });
+  S.says = {};
+}
+function say(who, text, opts = {}) {
+  S.says[who]?.kill();
+  const at = { alice: P(POS.alice.x, 74), bob: P(POS.bob.x, 74), server: P(0, -160), note: P(0, 176) }[who];
+  S.says[who] = pill(L.pills, at.x, at.y, text, { icon: 'info', ...opts });
+  return S.says[who];
+}
+function hush(who) { S.says[who]?.kill(); S.says[who] = null; }
+function link(a, b, { muted = false, dashed = false, color } = {}) {
+  const p1 = toward(a, b, 8), p2 = toward(b, a, 10);
+  return el('path', { d: `M${f(p1.x)},${f(p1.y)} L${f(p2.x)},${f(p2.y)}`, fill: 'none', stroke: color || (muted ? '#a59c90' : INK),
+    'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-dasharray': dashed ? '7 7' : 'none',
+    'marker-end': `url(#${color ? 'arrow-green' : muted ? 'arrow-muted' : 'arrow'})` }, L.links);
+}
+function pipe(a, b) {
+  const g = el('g', {}, L.links), d = `M${f(a.x)},${f(a.y)} L${f(b.x)},${f(b.y)}`;
+  el('path', { d, stroke: INK, 'stroke-width': 11, 'stroke-linecap': 'round' }, g);
+  el('path', { d, stroke: '#b2d491', 'stroke-width': 7, 'stroke-linecap': 'round' }, g);
+  el('path', { d, stroke: '#fff', 'stroke-opacity': .55, 'stroke-width': 1.6, 'stroke-linecap': 'round', transform: 'translate(0 -1.6)' }, g);
+  g.style.opacity = 0;
+  tween(500, k => g.style.opacity = k).catch(() => {});
+  return g;
+}
+const PK = {
+  request: { fill: '#f6b98a', glow: '#f3a46a' }, response: { fill: '#a6d38b', glow: '#7fc278' },
+  empty: { fill: '#fbf6ef', glow: '#d8cbb8' }, message: { fill: '#f6cd82', glow: '#f3b447', sq: true },
+  heartbeat: { ring: '#3fa456', glow: '#9fd68f' },
+};
+async function packet(kind, a, b, dur = 950) {
+  const k = PK[kind], g = el('g', {}, L.packets);
+  el('circle', { r: 13, fill: k.glow, opacity: .45, filter: 'url(#blur-sm)' }, g);
+  if (k.sq) { el('rect', { x: -8, y: -8, width: 16, height: 16, rx: 4, fill: k.fill, stroke: INK, 'stroke-width': 1.7 }, g);
+    el('path', { d: 'M-4.5,-2.5 L0,1 L4.5,-2.5', fill: 'none', stroke: INK, 'stroke-width': 1.4, 'stroke-linecap': 'round' }, g); }
+  else if (k.ring) el('circle', { r: 7.5, fill: '#f4fbf0', stroke: k.ring, 'stroke-width': 3 }, g);
+  else el('circle', { r: 7.5, fill: k.fill, stroke: INK, 'stroke-width': 1.7 }, g);
+  try {
+    await tween(dur, t => {
+      const x = a.x + (b.x - a.x) * t, y = a.y + (b.y - a.y) * t - Math.sin(Math.PI * t) * 16;
+      g.setAttribute('transform', `translate(${f(x)} ${f(y)})`);
+    });
+  } finally { g.remove(); }
+  burst(b, k.glow);
+}
+function burst(p, color) {
+  const c = el('circle', { cx: p.x, cy: p.y, r: 9, fill: 'none', stroke: color, 'stroke-width': 2.5, class: 'burst' }, L.fx);
+  setTimeout(() => c.remove(), 650);
+}
+function heldRing() {
+  const g = el('g', { class: 'held' }, L.links);
+  el('ellipse', { cx: POS.server.x, cy: POS.server.y + 4, rx: 150, ry: 75, fill: '#7c63d0', 'fill-opacity': .07, stroke: '#7c63d0', 'stroke-width': 2, 'stroke-dasharray': '6 7' }, g);
+  return g;
+}
+
+/* ---------- metrics + narration ---------- */
+const M = { req: 0, empty: 0 };
+function metric(id, v) { const e = $(id); e.textContent = v; e.classList.remove('flash'); void e.offsetWidth; e.classList.add('flash'); }
+function bump(k) { M[k]++; metric(k === 'req' ? 'm-req' : 'm-empty', M[k]); }
+const SECOND = 420; // one simulated second of story time, in real ms
+const fmtDelay = ms => (ms / SECOND).toFixed(1) + ' s';
+let SCENE = null;
+function step(i) {
+  const st = SCENE.steps[i];
+  $('stepNo').textContent = `Step ${i + 1} / ${SCENE.steps.length}`;
+  $('stepTitle').textContent = st[0]; $('stepBody').textContent = st[1];
+  const tx = $('stepText'); tx.classList.remove('fade'); void tx.offsetWidth; tx.classList.add('fade');
+  [...$('stepList').children].forEach((li, j) => li.className = j < i ? 'done' : j === i ? 'now' : '');
+}
+
+/* ---------- scenes ---------- */
+const SCENES = {
+  polling: {
+    tag: 'HTTP', key: 'Polling works everywhere and is easy to build. A shorter interval makes messages arrive sooner, but most requests come back empty.',
+    steps: [
+      ['Alice asks the server', 'Every few seconds Alice’s app sends a request: anything new for me? The server answers straight away.'],
+      ['Nothing new: an empty reply', 'Most polls come back with nothing. Each one still costs a full request and response.'],
+      ['Bob sends a message', 'Bob’s message reaches the server and is stored there for Alice.'],
+      ['The server has to wait', 'Over plain HTTP the server can only answer requests. It can’t start one, so the message sits until Alice asks again.'],
+      ['The next poll picks it up', 'Alice’s next poll gets the message. The delay is whatever was left of her polling interval.'],
+    ],
+    async play() {
+      let msgAt = null;
+      const poll = async (hasMsg) => {
+        say('alice', 'anything new?');
+        const ln = link(POS.A, POS.SL);
+        await packet('request', POS.A, POS.SL); bump('req');
+        ln.remove();
+        const back = link(POS.SL, POS.A);
+        if (hasMsg) {
+          hush('server');
+          await packet('response', POS.SL, POS.A, 1000);
+          addBubble(S.alice, 'in', '#cbbae6'); say('alice', 'got it!', { icon: 'chat', bg: '#e7ddf5' });
+          metric('m-delay', fmtDelay(clock - msgAt));
+        } else { await packet('empty', POS.SL, POS.A, 1000); bump('empty'); say('alice', 'nothing yet'); }
+        back.remove();
+      };
+      step(0); await wait(400); await poll(false); await wait(900);
+      step(1); hush('alice'); await wait(1100); await poll(false); await wait(500);
+      step(2); say('bob', 'Bob sends', { icon: null });
+      addBubble(S.bob, 'out', '#cfe3b2');
+      const bl = link(POS.Bp, POS.SR); await packet('message', POS.Bp, POS.SR, 1000); msgAt = clock; bl.remove(); hush('bob');
+      say('server', '1 new message for Alice', { icon: 'chat', bg: '#e7ddf5', size: 16, float: true });
+      await wait(900);
+      step(3);
+      const dl = link(POS.SL, POS.A, { muted: true, dashed: true });
+      say('note', 'server can’t\nstart a request', { icon: null, bg: '#ece5da', weight: 500, size: 14 });
+      await wait(2600); dl.remove(); hush('note');
+      step(4); await poll(true); await wait(2600);
+    },
+  },
+  long: {
+    tag: 'HTTP · HELD', key: 'Long polling gets close to real time over ordinary HTTP. The cost is that the server keeps one open request per waiting user.',
+    steps: [
+      ['Alice asks, the server holds on', 'Alice sends a request. Instead of answering at once, the server keeps it open until it has something to say.'],
+      ['Timeout: an empty reply', 'If nothing arrives within about 30 seconds, the server answers empty so proxies don’t cut the line.'],
+      ['Alice reconnects at once', 'As soon as any reply lands, Alice opens a new request. There’s almost always one waiting at the server.'],
+      ['Bob sends, Alice gets it now', 'The server answers the held request the moment Bob’s message arrives. There’s no interval to wait out.'],
+    ],
+    async play() {
+      const open = async () => {
+        say('alice', 'anything new?');
+        const ln = link(POS.A, POS.SL); await packet('request', POS.A, POS.SL); bump('req'); ln.remove();
+        const ring = heldRing(); const ln2 = link(POS.A, POS.SL, { muted: true, dashed: true });
+        return () => { ring.remove(); ln2.remove(); };
+      };
+      step(0); await wait(400);
+      let release = await open();
+      const timer = say('server', 'holding · 0 s', { icon: 'clock', bg: '#fbf6ef', size: 15 });
+      await wait(500);
+      step(1);
+      await tween(2600, k => { const t = timer.querySelector('text'); if (t) t.textContent = `holding · ${String(Math.round(k * 30)).padStart(2, ' ')} s`; }, k => k);
+      hush('server'); release();
+      const bk = link(POS.SL, POS.A); await packet('empty', POS.SL, POS.A); bump('empty'); bk.remove();
+      say('alice', 'timed out, retry');
+      await wait(700);
+      step(2); release = await open(); say('server', 'holding…', { icon: 'clock' });
+      await wait(1200);
+      step(3); say('bob', 'Bob sends', { icon: null }); addBubble(S.bob, 'out', '#cfe3b2');
+      const bl = link(POS.Bp, POS.SR); await packet('message', POS.Bp, POS.SR); const msgAt = clock; bl.remove(); hush('bob');
+      say('server', 'answer the held request', { icon: 'bolt', bg: '#e7ddf5' });
+      release();
+      const rl = link(POS.SL, POS.A); await packet('response', POS.SL, POS.A, 900); rl.remove();
+      addBubble(S.alice, 'in', '#cbbae6'); say('alice', 'got it!', { icon: 'chat', bg: '#e7ddf5' });
+      metric('m-delay', fmtDelay(clock - msgAt)); hush('server');
+      await wait(1200);
+      release = await open(); say('server', 'holding…', { icon: 'clock' });
+      await wait(2400); release();
+    },
+  },
+  ws: {
+    tag: 'WS', key: 'A WebSocket costs one handshake, then every message is a small frame in either direction. The server keeps a stateful connection for every online user.',
+    steps: [
+      ['Upgrade handshake', 'Each phone sends one HTTP request asking to upgrade. The server replies 101 Switching Protocols.'],
+      ['One open pipe each', 'The connection now stays open both ways. Small heartbeats check it’s still alive.'],
+      ['Bob sends, the server pushes', 'Bob’s message goes up his pipe and the server pushes it straight down Alice’s. Nobody had to ask.'],
+      ['Alice replies the same way', 'Either side can send at any moment. This is how most chat apps work.'],
+    ],
+    async play() {
+      step(0); await wait(400);
+      say('alice', 'Upgrade: websocket', { icon: null, size: 14 }); say('bob', 'Upgrade: websocket', { icon: null, size: 14 });
+      const l1 = link(POS.A, POS.SL), l2 = link(POS.Bp, POS.SR);
+      await Promise.all([packet('request', POS.A, POS.SL), packet('request', POS.Bp, POS.SR)]); bump('req'); bump('req');
+      l1.remove(); l2.remove();
+      say('server', '101 Switching Protocols', { icon: null, bg: '#cfe3b2', size: 15 });
+      const r1 = link(POS.SL, POS.A), r2 = link(POS.SR, POS.Bp);
+      await Promise.all([packet('response', POS.SL, POS.A), packet('response', POS.SR, POS.Bp)]);
+      r1.remove(); r2.remove(); hush('alice'); hush('bob');
+      step(1); pipe(POS.A, POS.SL); pipe(POS.Bp, POS.SR); hush('server');
+      say('note', 'connection stays open', { icon: null, bg: '#e3f2d8', size: 14, weight: 500 });
+      const beats = (async () => {
+        try { while (alive()) {
+          await Promise.all([packet('heartbeat', POS.SL, POS.A, 800), packet('heartbeat', POS.SR, POS.Bp, 800)]);
+          await Promise.all([packet('heartbeat', POS.A, POS.SL, 800), packet('heartbeat', POS.Bp, POS.SR, 800)]);
+          await wait(1600);
+        } } catch (e) { if (e !== CANCEL) throw e; }
+      })();
+      await wait(2600); hush('note');
+      step(2); say('bob', 'Bob sends', { icon: null }); addBubble(S.bob, 'out', '#cfe3b2');
+      await packet('message', POS.Bp, POS.SR, 800); const msgAt = clock; hush('bob');
+      say('server', 'push to Alice', { icon: 'bolt', bg: '#e7ddf5' });
+      await packet('message', POS.SL, POS.A, 800);
+      addBubble(S.alice, 'in', '#cbbae6'); say('alice', 'got it!', { icon: 'chat', bg: '#e7ddf5' });
+      metric('m-delay', fmtDelay(clock - msgAt)); await wait(1300); hush('server');
+      step(3); say('alice', 'Alice replies', { icon: null }); addBubble(S.alice, 'out', '#cfe3b2');
+      await packet('message', POS.A, POS.SL, 800);
+      say('server', 'push to Bob', { icon: 'bolt', bg: '#e7ddf5' });
+      await packet('message', POS.SR, POS.Bp, 800);
+      addBubble(S.bob, 'in', '#cbbae6'); say('bob', 'got it!', { icon: 'chat', bg: '#e7ddf5' });
+      await wait(3200);
+    },
+  },
+};
+
+async function start(name) {
+  run.dead = true; for (const tw of [...tweens]) tw.kill();
+  run = { dead: false };
+  SCENE = SCENES[name]; current = name;
+  for (const k of Object.keys(SCENES)) $('tab-' + k).setAttribute('aria-pressed', String(k === name));
+  $('modeTag').textContent = SCENE.tag; $('keyIdea').textContent = SCENE.key;
+  $('stepList').replaceChildren(...SCENE.steps.map((s, i) => { const li = document.createElement('li'); li.innerHTML = `<i>${i + 1}</i><span></span>`; li.lastChild.textContent = s[0]; return li; }));
+  M.req = 0; M.empty = 0; $('m-req').textContent = '0'; $('m-empty').textContent = '0'; $('m-delay').textContent = '—';
+  const token = run;
+  buildScene();
+  try {
+    while (!token.dead) {
+      await SCENE.play();
+      if (token.dead) break;
+      buildScene();
+    }
+  } catch (e) { if (e !== CANCEL) console.error(e); }
+}
+let current = 'polling';
+for (const k of Object.keys(SCENES)) $('tab-' + k).addEventListener('click', () => start(k));
+function setPaused(p) { paused = p; $('pause').querySelector('span').textContent = p ? 'Play' : 'Pause'; document.getElementById('stage').style.opacity = 1; }
+$('pause').addEventListener('click', () => setPaused(!paused));
+$('replay').addEventListener('click', () => { setPaused(false); start(current); });
+addEventListener('keydown', e => {
+  if (e.target.closest('button') && e.key === ' ') return;
+  if (e.key === ' ') { e.preventDefault(); setPaused(!paused); }
+  else if (e.key === 'r' || e.key === 'R') { setPaused(false); start(current); }
+  else if (e.key === '1') start('polling'); else if (e.key === '2') start('long'); else if (e.key === '3') start('ws');
+});
+
+/* ---------- kit gallery ---------- */
+(function kit() {
+  const svg = $('kitSvg'), g = el('g', {}, svg);
+  const cap = (x, t) => { const e = el('text', { class: 'st', x, y: 268, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 600 }, g); e.textContent = t; };
+  box(g, { cx: 95, cy: 175, w: 66, h: 15, r: 10 }); cap(95, 'slab');
+  box(g, { cx: 255, cy: 190, w: 54, h: 92, r: 13, color: 'blue' }); cap(255, 'cube · blue');
+  box(g, { cx: 410, cy: 190, w: 54, h: 66, r: 13, color: 'purple' }); cap(410, 'cube · purple');
+  const gc = box(g, { cx: 565, cy: 190, w: 54, h: 42, r: 12, color: 'green' }); cap(565, 'cube · green');
+  box(g, { cx: 565, cy: 190 - 42, w: 30, h: 26, r: 8, color: 'orange' });
+  cylinder(g, { cx: 725, cy: 200, rx: 46, h: 78, color: 'yellow' }); cap(725, 'store');
+  box(g, { cx: 895, cy: 200, w: 66, h: 15, r: 10 });
+  phone(g, { x: 895, y: 185, s: .9 }); cap(895, 'device');
+  pill(g, 255, 42, 'pill label', { icon: 'info', size: 14 });
+  pill(g, 565, 42, '1 new message', { icon: 'chat', size: 14, bg: '#e7ddf5' });
+})();
+const SW = [['paper', '#f4ebe0'], ['ink', '#1d1b18'], ['blue', '#a7c3e7'], ['purple', '#c9b8e5'], ['green', '#b0d59c'], ['orange', '#f2b27c'], ['yellow', '#f5cb7f'], ['shadow', '#6b5236']];
+$('swatches').replaceChildren(...SW.map(([n, c]) => { const d = document.createElement('div'); d.className = 'sw'; d.innerHTML = `<div style="background:${c}"></div><p>${n}<br><span>${c}</span></p>`; return d; }));
+
+(document.fonts ? document.fonts.ready : Promise.resolve()).then(() => start('polling'));
+</script>

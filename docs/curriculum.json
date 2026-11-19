@@ -1,0 +1,1827 @@
+{
+  "version": 1,
+  "note": "First lesson of every track is free. During testing all lessons are open (PAYWALL_ENABLED=false).",
+  "stages": [
+    {
+      "id": 1,
+      "name": "Foundations",
+      "subtitle": "How computers talk"
+    },
+    {
+      "id": 2,
+      "name": "Building blocks",
+      "subtitle": "APIs, scale, numbers"
+    },
+    {
+      "id": 3,
+      "name": "Data",
+      "subtitle": "Databases inside out"
+    },
+    {
+      "id": 4,
+      "name": "Speed & async",
+      "subtitle": "Caches, queues, streams"
+    },
+    {
+      "id": 5,
+      "name": "Distributed",
+      "subtitle": "Theory that holds it up"
+    },
+    {
+      "id": 6,
+      "name": "Production",
+      "subtitle": "Run it for real"
+    },
+    {
+      "id": 7,
+      "name": "Interview",
+      "subtitle": "The design round"
+    },
+    {
+      "id": 8,
+      "name": "Case studies & labs",
+      "subtitle": "Design real systems"
+    }
+  ],
+  "tracks": [
+    {
+      "id": 1,
+      "stage": 1,
+      "name": "How the Internet Works",
+      "color": "blue",
+      "summary": "Zero to confident: what actually happens between a tap and a reply.",
+      "checkpoint": "Trace a page load end to end and name where every millisecond goes.",
+      "lessons": [
+        {
+          "id": "1.1",
+          "title": "What happens when you press Enter",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Full trip: browser, DNS, TCP, TLS, server, database and back, with a running stopwatch"
+        },
+        {
+          "id": "1.2",
+          "title": "Clients, servers and the request-response loop",
+          "level": "beginner",
+          "access": "free",
+          "animation": "A phone asks, a server answers; why the server never speaks first"
+        },
+        {
+          "id": "1.3",
+          "title": "IP addresses, ports and packets",
+          "level": "beginner",
+          "access": "free",
+          "animation": "A message splits into packets that hop across routers and reassemble in order"
+        },
+        {
+          "id": "1.4",
+          "title": "DNS from the inside",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Resolver walks root, TLD and authoritative servers; later lookups hit the cache until TTL runs out"
+        },
+        {
+          "id": "1.5",
+          "title": "TCP: reliable delivery",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Three-way handshake, numbered segments, ACKs, a lost packet and its retransmit"
+        },
+        {
+          "id": "1.6",
+          "title": "UDP and when to skip reliability",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Video-call frames fly without ACKs; a lost frame is simply skipped"
+        },
+        {
+          "id": "1.7",
+          "title": "TLS and HTTPS",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Certificate check, key exchange, then the payload turns into scrambled ciphertext on the wire"
+        },
+        {
+          "id": "1.8",
+          "title": "HTTP/1.1 vs HTTP/2 vs HTTP/3",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "One slow file blocks the line in 1.1; streams interleave in 2; QUIC survives a lost packet in 3"
+        },
+        {
+          "id": "1.9",
+          "title": "Latency numbers every engineer should know",
+          "level": "beginner",
+          "access": "free",
+          "animation": "RAM, SSD, same-datacenter and cross-ocean calls scaled to human time: seconds vs months"
+        },
+        {
+          "id": "1.10",
+          "title": "Throughput, bandwidth and queues",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "A pipe fills, a queue forms, waiting time explodes as utilisation nears 100% (Little's law)"
+        },
+        {
+          "id": "1.11",
+          "title": "Proxies and reverse proxies",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Forward proxy hides the client; reverse proxy hides the servers and terminates TLS"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "stage": 2,
+      "name": "APIs & Communication",
+      "color": "purple",
+      "summary": "How services talk, and how to pick the right way for each job.",
+      "checkpoint": "Design the API for a food-delivery app: endpoints, pagination, auth and real-time order updates.",
+      "lessons": [
+        {
+          "id": "2.1",
+          "title": "REST from first principles",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Resources, verbs and status codes; the same URL with GET, POST, PUT and DELETE"
+        },
+        {
+          "id": "2.2",
+          "title": "Idempotency and safe retries",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "A payment request retried after a timeout charges twice, then an idempotency key stops it"
+        },
+        {
+          "id": "2.3",
+          "title": "Pagination: offset vs cursor",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Offset pages skip and duplicate rows as new rows arrive; cursors stay stable"
+        },
+        {
+          "id": "2.4",
+          "title": "Polling, long polling, SSE and WebSockets",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Alice and Bob chat four ways; count wasted requests and delivery delay"
+        },
+        {
+          "id": "2.5",
+          "title": "Webhooks",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Server calls you back; retries with backoff, signature check, replay protection"
+        },
+        {
+          "id": "2.6",
+          "title": "GraphQL and the N+1 problem",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "One query fans out to resolvers; a DataLoader batches 50 database calls into 1"
+        },
+        {
+          "id": "2.7",
+          "title": "gRPC and Protocol Buffers",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Binary frames vs JSON text; bidirectional streaming over one HTTP/2 connection"
+        },
+        {
+          "id": "2.8",
+          "title": "API gateway",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "One front door: auth, rate limit, routing and response aggregation for many services"
+        },
+        {
+          "id": "2.9",
+          "title": "Sessions vs tokens (JWT)",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Server-side session lookup vs a signed token verified anywhere; what logout really means"
+        },
+        {
+          "id": "2.10",
+          "title": "OAuth 2.0 and OpenID Connect",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Authorization-code flow with PKCE between app, browser, auth server and API"
+        },
+        {
+          "id": "2.11",
+          "title": "Serialization formats",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "JSON vs Protobuf vs Avro: size on the wire, schema evolution, a field added safely"
+        },
+        {
+          "id": "2.12",
+          "title": "API versioning and backward compatibility",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Old and new clients hit the same service; additive changes vs breaking ones"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "stage": 2,
+      "name": "Napkin Math",
+      "color": "yellow",
+      "summary": "Estimate load, storage and cost in your head. Interviewers watch for this.",
+      "checkpoint": "Estimate servers, storage and bandwidth for a photo-sharing app with 50M daily users.",
+      "lessons": [
+        {
+          "id": "3.1",
+          "title": "Powers of two and units",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Bytes stack into KB, MB, GB, TB, PB as blocks; a tweet vs a photo vs a movie"
+        },
+        {
+          "id": "3.2",
+          "title": "From daily users to requests per second",
+          "level": "beginner",
+          "access": "free",
+          "animation": "50M users × actions ÷ 86,400 seconds; average vs peak traffic curve"
+        },
+        {
+          "id": "3.3",
+          "title": "Storage estimation",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "A year of uploads piles up; replication factor triples the stack"
+        },
+        {
+          "id": "3.4",
+          "title": "Bandwidth and egress cost",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Video bitrate × concurrent viewers; where the CDN bill comes from"
+        },
+        {
+          "id": "3.5",
+          "title": "How many servers do I need?",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Requests per second ÷ capacity per box, plus headroom for peaks and failures"
+        },
+        {
+          "id": "3.6",
+          "title": "Estimation drills",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Five timed exercises with worked answers: Twitter, YouTube, WhatsApp, Uber, Google Search"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "stage": 2,
+      "name": "Scaling the Web Tier",
+      "color": "green",
+      "summary": "Go from one server to millions of users, one bottleneck at a time.",
+      "checkpoint": "Your launch day traffic is 20× normal. Scale the app without downtime.",
+      "lessons": [
+        {
+          "id": "4.1",
+          "title": "One server does everything",
+          "level": "beginner",
+          "access": "free",
+          "animation": "App, database and files on one box until the CPU graph hits the ceiling"
+        },
+        {
+          "id": "4.2",
+          "title": "Vertical vs horizontal scaling",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Bigger box vs more boxes; cost curve and the hard ceiling of one machine"
+        },
+        {
+          "id": "4.3",
+          "title": "Stateless servers and sessions",
+          "level": "beginner",
+          "access": "free",
+          "animation": "A user bounces between servers and gets logged out; session moves to a shared store"
+        },
+        {
+          "id": "4.4",
+          "title": "Load balancers: L4 vs L7",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "Packets routed by IP and port vs requests routed by URL and headers"
+        },
+        {
+          "id": "4.5",
+          "title": "Load-balancing algorithms",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Round robin, least connections, weighted and hash-based on a live traffic mix"
+        },
+        {
+          "id": "4.6",
+          "title": "Health checks and failover",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "A server stops answering pings and is pulled from rotation in seconds"
+        },
+        {
+          "id": "4.7",
+          "title": "CDNs and edge caching",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Users far away hit nearby edges; cache hit, cache miss and origin shield"
+        },
+        {
+          "id": "4.8",
+          "title": "Cache invalidation at the edge",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "A wrong image is cached worldwide; purge vs versioned file names"
+        },
+        {
+          "id": "4.9",
+          "title": "Autoscaling",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Traffic rises, new instances boot with a lag, then scale in after the wave"
+        },
+        {
+          "id": "4.10",
+          "title": "Connection pooling",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Thousands of app threads vs 100 database connections; the pool queues them"
+        },
+        {
+          "id": "4.11",
+          "title": "Multi-region and geo-routing",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "DNS sends users to the nearest region; a region fails and traffic drains away"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "stage": 3,
+      "name": "Inside a Database",
+      "color": "orange",
+      "summary": "What a database actually does with your data on disk. This is where most courses stop and we start.",
+      "checkpoint": "A query went from 5 ms to 9 seconds. Find out why using EXPLAIN and fix it.",
+      "lessons": [
+        {
+          "id": "5.1",
+          "title": "How a row is stored on disk",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "Rows packed into 8 KB pages, pages into a heap file, a new row finding free space"
+        },
+        {
+          "id": "5.2",
+          "title": "Memory vs disk and the buffer pool",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Pages loaded into RAM, dirty pages flushed, LRU eviction of cold pages"
+        },
+        {
+          "id": "5.3",
+          "title": "Full table scan",
+          "level": "beginner",
+          "access": "pro",
+          "animation": "Without an index the database reads every page to find one row; the counter climbs"
+        },
+        {
+          "id": "5.4",
+          "title": "B-tree indexes from scratch",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Keys inserted, a node fills and splits, the tree grows one level"
+        },
+        {
+          "id": "5.5",
+          "title": "How a query uses an index",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Index seek walks root to leaf then fetches the row; compare pages read vs a full scan"
+        },
+        {
+          "id": "5.6",
+          "title": "Composite indexes and the leftmost-prefix rule",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Index on (country, city) helps one query and is useless for another"
+        },
+        {
+          "id": "5.7",
+          "title": "Covering indexes",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Query answered from the index alone, no trip to the table"
+        },
+        {
+          "id": "5.8",
+          "title": "Hash indexes",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Exact lookups in one hop; range queries fall apart"
+        },
+        {
+          "id": "5.9",
+          "title": "The query planner and EXPLAIN",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Planner weighs plans by cost estimates and picks one; reading the plan tree"
+        },
+        {
+          "id": "5.10",
+          "title": "Joins: nested loop, hash and merge",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Three join algorithms run side by side on the same two tables"
+        },
+        {
+          "id": "5.11",
+          "title": "Write-ahead log and crash recovery",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Write logged first, power cut, database replays the log on restart"
+        },
+        {
+          "id": "5.12",
+          "title": "LSM trees",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Writes hit a memtable, flush to SSTables, compaction merges them in the background"
+        },
+        {
+          "id": "5.13",
+          "title": "Bloom filters",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "A bit array answers \"definitely not here\" and skips disk reads"
+        },
+        {
+          "id": "5.14",
+          "title": "Row stores vs column stores",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Analytics query reads one column from many rows; columnar compression shrinks it"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "stage": 3,
+      "name": "Transactions & Concurrency",
+      "color": "pink",
+      "summary": "Two users touching the same data at the same moment. What can go wrong and how databases stop it.",
+      "checkpoint": "Two people buy the last concert ticket at the same moment. Make sure only one gets it.",
+      "lessons": [
+        {
+          "id": "6.1",
+          "title": "ACID, made visible",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "Bank transfer fails halfway; atomicity rolls both sides back"
+        },
+        {
+          "id": "6.2",
+          "title": "Isolation anomalies",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Dirty read, non-repeatable read, phantom read and lost update, each animated"
+        },
+        {
+          "id": "6.3",
+          "title": "Isolation levels",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Same race run at Read Committed, Repeatable Read and Serializable"
+        },
+        {
+          "id": "6.4",
+          "title": "Write skew",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Two doctors both go off call because each saw the other on duty"
+        },
+        {
+          "id": "6.5",
+          "title": "Locks and deadlocks",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Two transactions wait on each other; the detector picks a victim"
+        },
+        {
+          "id": "6.6",
+          "title": "Optimistic vs pessimistic concurrency",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Version check on write vs locking up front, under low and high contention"
+        },
+        {
+          "id": "6.7",
+          "title": "MVCC",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Readers see an old row version while a writer creates a new one; vacuum cleans up"
+        },
+        {
+          "id": "6.8",
+          "title": "Normalisation vs denormalisation",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Join three tables vs read one wide row; the update anomaly that follows"
+        },
+        {
+          "id": "6.9",
+          "title": "SQL vs NoSQL: choosing well",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Decision walk-through by access pattern, consistency need and scale"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "stage": 3,
+      "name": "Scaling Databases",
+      "color": "blue",
+      "summary": "When one database is not enough: copies, splits and the problems they bring.",
+      "checkpoint": "Shard a 10 TB user table with zero downtime and no hot spots.",
+      "lessons": [
+        {
+          "id": "7.1",
+          "title": "Read replicas",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "Writes go to the leader, reads spread across followers"
+        },
+        {
+          "id": "7.2",
+          "title": "Replication lag",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "User posts a comment, refreshes, and it is gone; read-your-writes fixes it"
+        },
+        {
+          "id": "7.3",
+          "title": "Sync vs async replication",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Durability vs latency; the leader dies before followers catch up"
+        },
+        {
+          "id": "7.4",
+          "title": "Leader failover and split brain",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Leader goes quiet, a follower is promoted, the old leader comes back confused"
+        },
+        {
+          "id": "7.5",
+          "title": "Multi-leader replication and conflicts",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Two regions edit the same row; last-write-wins vs merge"
+        },
+        {
+          "id": "7.6",
+          "title": "Leaderless replication and quorums",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Writes to W nodes, reads from R nodes, R + W > N guarantees overlap"
+        },
+        {
+          "id": "7.7",
+          "title": "Partitioning by range vs by hash",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Range keeps order but piles up on hot ranges; hash spreads evenly"
+        },
+        {
+          "id": "7.8",
+          "title": "Consistent hashing",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Keys on a ring; add a node and only a slice of keys move; virtual nodes even it out"
+        },
+        {
+          "id": "7.9",
+          "title": "Rebalancing partitions",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Data streams to a new node while traffic continues"
+        },
+        {
+          "id": "7.10",
+          "title": "Hot keys and the celebrity problem",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "One celebrity's posts melt one shard; key splitting and caching"
+        },
+        {
+          "id": "7.11",
+          "title": "Secondary indexes on sharded data",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Local indexes need scatter-gather; global indexes need async updates"
+        },
+        {
+          "id": "7.12",
+          "title": "Distributed transactions and two-phase commit",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Coordinator asks prepare, then commit; it crashes in the middle"
+        },
+        {
+          "id": "7.13",
+          "title": "Sagas",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Booking flight, hotel and car; a failure triggers compensating steps in reverse"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "stage": 3,
+      "name": "Beyond SQL: Data Store Families",
+      "color": "green",
+      "summary": "The right store for each shape of data, and how each one works underneath.",
+      "checkpoint": "Pick and justify the stores for an e-commerce site: catalogue, cart, search, orders and analytics.",
+      "lessons": [
+        {
+          "id": "8.1",
+          "title": "Key-value stores",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "Get and put by key; partition key decides the node"
+        },
+        {
+          "id": "8.2",
+          "title": "Document stores",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "JSON documents, embedded vs referenced, indexes on nested fields"
+        },
+        {
+          "id": "8.3",
+          "title": "Wide-column stores (Cassandra-style)",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Partition key picks the node on the ring, clustering key sorts rows inside it"
+        },
+        {
+          "id": "8.4",
+          "title": "Search engines and inverted indexes",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Text is tokenised, terms point to documents, results ranked by relevance"
+        },
+        {
+          "id": "8.5",
+          "title": "Time-series databases",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Metrics arrive in time order, compress by chunk, downsample old data"
+        },
+        {
+          "id": "8.6",
+          "title": "Graph databases",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Friends-of-friends query hops edges instead of joining tables"
+        },
+        {
+          "id": "8.7",
+          "title": "Vector databases",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Text becomes embeddings; nearest-neighbour search walks an HNSW graph"
+        },
+        {
+          "id": "8.8",
+          "title": "Object storage (S3-style)",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Buckets and keys, multipart upload, erasure coding spreads chunks across disks"
+        },
+        {
+          "id": "8.9",
+          "title": "Data warehouses and lakes",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Nightly loads vs streaming ingestion; star schema; columnar scans"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "stage": 4,
+      "name": "Caching & Redis",
+      "color": "orange",
+      "summary": "Make reads instant and understand exactly what Redis does with each command.",
+      "checkpoint": "Your homepage cache expires and the database falls over. Stop the stampede.",
+      "lessons": [
+        {
+          "id": "9.1",
+          "title": "Why caching works",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Hit vs miss timings; hit ratio slider shows the database load dropping"
+        },
+        {
+          "id": "9.2",
+          "title": "Cache-aside, read-through, write-through and write-back",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Four patterns animated on the same read and write"
+        },
+        {
+          "id": "9.3",
+          "title": "TTL and invalidation",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Stale price shown after an update; delete-on-write vs short TTL"
+        },
+        {
+          "id": "9.4",
+          "title": "Eviction policies: LRU and LFU",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Cache fills up and the least recently or least frequently used keys get evicted"
+        },
+        {
+          "id": "9.5",
+          "title": "Cache stampede",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Hot key expires, 1,000 requests miss at once; locking and early refresh fix it"
+        },
+        {
+          "id": "9.6",
+          "title": "Cache penetration and avalanche",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Lookups for keys that never exist; mass expiry at midnight; jittered TTLs"
+        },
+        {
+          "id": "9.7",
+          "title": "Redis single-threaded event loop",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "One thread serves thousands of sockets via epoll; one slow command blocks everyone"
+        },
+        {
+          "id": "9.8",
+          "title": "Redis data structures inside",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Strings, hashes, lists, sets and a sorted set's skip list, each drawn in memory"
+        },
+        {
+          "id": "9.9",
+          "title": "Redis persistence: RDB vs AOF",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Snapshot fork vs append-only log; what survives a crash"
+        },
+        {
+          "id": "9.10",
+          "title": "Redis replication and Sentinel",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Replica follows the primary; Sentinel votes and promotes on failure"
+        },
+        {
+          "id": "9.11",
+          "title": "Redis Cluster and hash slots",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "16,384 slots across nodes; a MOVED redirect when the client asks the wrong node"
+        },
+        {
+          "id": "9.12",
+          "title": "Redis recipes",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Leaderboard with a sorted set, rate limiter with INCR, session store with TTL"
+        },
+        {
+          "id": "9.13",
+          "title": "Distributed locks with Redis",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "SET NX with expiry; a GC pause makes two holders; fencing tokens fix it"
+        },
+        {
+          "id": "9.14",
+          "title": "Pub/Sub and Streams",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Fire-and-forget fan-out vs a persistent stream with consumer groups"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "stage": 4,
+      "name": "Queues, Streams & Async Work",
+      "color": "yellow",
+      "summary": "Do slow work later, absorb spikes and connect services without tight coupling.",
+      "checkpoint": "Build the order pipeline for flash-sale traffic: no lost orders, no double charges.",
+      "lessons": [
+        {
+          "id": "10.1",
+          "title": "Why go async",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Signup waits for email, image resize and analytics; a queue makes it instant"
+        },
+        {
+          "id": "10.2",
+          "title": "Message queues",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Producer, broker, consumer; acks and redelivery when a consumer crashes"
+        },
+        {
+          "id": "10.3",
+          "title": "Delivery guarantees",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "At-most-once loses messages, at-least-once duplicates them, exactly-once is a trade-off"
+        },
+        {
+          "id": "10.4",
+          "title": "Idempotent consumers",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "The same message processed twice changes nothing the second time"
+        },
+        {
+          "id": "10.5",
+          "title": "Dead-letter queues and poison messages",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "A bad message fails five times and is parked for inspection"
+        },
+        {
+          "id": "10.6",
+          "title": "Kafka: the log",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Append-only partitions, offsets, consumers reading at their own pace"
+        },
+        {
+          "id": "10.7",
+          "title": "Kafka consumer groups and rebalancing",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Partitions split among consumers; one joins and partitions move"
+        },
+        {
+          "id": "10.8",
+          "title": "Kafka replication and ISR",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Leader and followers per partition; acks=all and the in-sync replica set"
+        },
+        {
+          "id": "10.9",
+          "title": "Ordering guarantees",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Order kept within a partition, lost across them; choosing the key"
+        },
+        {
+          "id": "10.10",
+          "title": "Backpressure",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Consumers fall behind; lag grows; throttling and buffering upstream"
+        },
+        {
+          "id": "10.11",
+          "title": "Fan-out: pub/sub topics",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "One event delivered to email, push and analytics services in parallel"
+        },
+        {
+          "id": "10.12",
+          "title": "Event-driven architecture",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Services react to events instead of calling each other"
+        },
+        {
+          "id": "10.13",
+          "title": "Event sourcing and CQRS",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "State rebuilt by replaying events; separate read models for queries"
+        },
+        {
+          "id": "10.14",
+          "title": "Transactional outbox and CDC",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Write to the database and publish the event without losing either"
+        },
+        {
+          "id": "10.15",
+          "title": "Stream processing",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Windows, watermarks and late events in a real-time click counter"
+        },
+        {
+          "id": "10.16",
+          "title": "Batch processing and MapReduce",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Map, shuffle and reduce over a word count across many machines"
+        },
+        {
+          "id": "10.17",
+          "title": "Job scheduling at scale",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Cron on one box vs a distributed scheduler with leases"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "stage": 5,
+      "name": "Distributed Systems Theory",
+      "color": "purple",
+      "summary": "The ideas behind every distributed database, lock and cluster. Senior interviews go here.",
+      "checkpoint": "Design a configuration service that stays correct when nodes crash and networks split.",
+      "lessons": [
+        {
+          "id": "11.1",
+          "title": "Why distributed systems are hard",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "The eight fallacies, each one breaking a toy system"
+        },
+        {
+          "id": "11.2",
+          "title": "Network partitions",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "The link between two data centres is cut; both sides keep taking writes"
+        },
+        {
+          "id": "11.3",
+          "title": "CAP theorem, properly",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "During a partition choose: refuse writes (CP) or accept and diverge (AP)"
+        },
+        {
+          "id": "11.4",
+          "title": "PACELC",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Even without a partition, every read pays latency or risks stale data"
+        },
+        {
+          "id": "11.5",
+          "title": "Consistency models",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Linearizable, sequential, causal and eventual on one timeline"
+        },
+        {
+          "id": "11.6",
+          "title": "Clocks and time",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Clocks drift; NTP corrects them; why timestamps cannot order events"
+        },
+        {
+          "id": "11.7",
+          "title": "Lamport and vector clocks",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Logical counters order events; vector clocks spot concurrent writes"
+        },
+        {
+          "id": "11.8",
+          "title": "Failure detection and gossip",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Heartbeats and suspicion; rumours spread across 100 nodes in a few rounds"
+        },
+        {
+          "id": "11.9",
+          "title": "Leader election",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Nodes vote with terms; a stale leader is ignored"
+        },
+        {
+          "id": "11.10",
+          "title": "Raft consensus",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Log entries replicate, commit on majority, survive leader crashes"
+        },
+        {
+          "id": "11.11",
+          "title": "Paxos intuition",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Proposers and acceptors agree on one value despite failures"
+        },
+        {
+          "id": "11.12",
+          "title": "Coordination services (ZooKeeper, etcd)",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Watches, ephemeral nodes and leases used for locks and config"
+        },
+        {
+          "id": "11.13",
+          "title": "Unique ID generation",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "UUIDs, database sequences and Snowflake IDs with time, machine and counter bits"
+        },
+        {
+          "id": "11.14",
+          "title": "CRDTs",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Two offline replicas merge without conflict: counters, sets and text"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "stage": 6,
+      "name": "Reliability & Resilience",
+      "color": "green",
+      "summary": "Systems fail all the time. Build ones that bend instead of break.",
+      "checkpoint": "A downstream service starts timing out. Stop the failure from spreading to your whole system.",
+      "lessons": [
+        {
+          "id": "12.1",
+          "title": "Failure is normal",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Disks, servers, networks and humans fail at known rates; the maths of nines"
+        },
+        {
+          "id": "12.2",
+          "title": "Timeouts",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "A call with no timeout ties up every thread in the pool"
+        },
+        {
+          "id": "12.3",
+          "title": "Retries with exponential backoff and jitter",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Retries in lockstep hammer a recovering service; jitter spreads them out"
+        },
+        {
+          "id": "12.4",
+          "title": "Circuit breakers",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Closed, open and half-open states driven by error rate"
+        },
+        {
+          "id": "12.5",
+          "title": "Bulkheads",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Separate pools so one slow dependency cannot sink the whole ship"
+        },
+        {
+          "id": "12.6",
+          "title": "Rate limiting algorithms",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Token bucket, leaky bucket, fixed window and sliding window on the same burst"
+        },
+        {
+          "id": "12.7",
+          "title": "Load shedding and graceful degradation",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "At overload drop low-priority work; show a simpler page instead of an error"
+        },
+        {
+          "id": "12.8",
+          "title": "Redundancy and single points of failure",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Find the one box whose failure takes everything down"
+        },
+        {
+          "id": "12.9",
+          "title": "Disaster recovery: RPO and RTO",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Backups, standby regions and how much data you can afford to lose"
+        },
+        {
+          "id": "12.10",
+          "title": "Chaos engineering",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Kill random instances in a controlled way and watch the system heal"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "stage": 6,
+      "name": "Microservices & Architecture",
+      "color": "blue",
+      "summary": "How large systems are split into services and kept manageable.",
+      "checkpoint": "Break a monolith into services without a big-bang rewrite.",
+      "lessons": [
+        {
+          "id": "13.1",
+          "title": "Monolith vs microservices",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "One deployable vs many; team size, deploy speed and failure blast radius"
+        },
+        {
+          "id": "13.2",
+          "title": "Service discovery",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Services register; clients look up healthy instances"
+        },
+        {
+          "id": "13.3",
+          "title": "Sync vs async between services",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Chain of calls multiplies latency and failure; events decouple"
+        },
+        {
+          "id": "13.4",
+          "title": "Data ownership per service",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "No shared database; each service owns its tables and publishes changes"
+        },
+        {
+          "id": "13.5",
+          "title": "Backend for frontend",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Mobile and web get tailored gateways"
+        },
+        {
+          "id": "13.6",
+          "title": "Service mesh and sidecars",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "A proxy beside each service handles retries, TLS and metrics"
+        },
+        {
+          "id": "13.7",
+          "title": "Distributed tracing",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "One request's spans across ten services in a waterfall"
+        },
+        {
+          "id": "13.8",
+          "title": "Configuration and feature flags",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Flip a flag and behaviour changes without a deploy"
+        },
+        {
+          "id": "13.9",
+          "title": "Strangler fig migration",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "New service takes routes from the monolith one at a time"
+        },
+        {
+          "id": "13.10",
+          "title": "Multi-tenancy",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Shared tables, schema per tenant or database per tenant; noisy neighbours"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "stage": 6,
+      "name": "Containers & Kubernetes",
+      "color": "purple",
+      "summary": "What actually happens inside a cluster when you deploy, scale or crash.",
+      "checkpoint": "Roll out a bad release, catch it with probes and roll back automatically.",
+      "lessons": [
+        {
+          "id": "14.1",
+          "title": "VMs vs containers",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Hypervisor with guest OSes vs namespaces and cgroups on one kernel"
+        },
+        {
+          "id": "14.2",
+          "title": "Images and layers",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Dockerfile steps become cached layers; a change rebuilds from that layer down"
+        },
+        {
+          "id": "14.3",
+          "title": "Kubernetes architecture",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "API server, etcd, scheduler, controllers and kubelets talking"
+        },
+        {
+          "id": "14.4",
+          "title": "Pods",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Containers sharing a network and volumes; the pod lifecycle"
+        },
+        {
+          "id": "14.5",
+          "title": "Deployments and ReplicaSets",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Desired state 3 pods; one dies; the controller makes a new one"
+        },
+        {
+          "id": "14.6",
+          "title": "Rolling updates and rollbacks",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Pods replaced one at a time; a failed version is rolled back"
+        },
+        {
+          "id": "14.7",
+          "title": "Services and kube-proxy",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Stable virtual IP spreading traffic to changing pod IPs"
+        },
+        {
+          "id": "14.8",
+          "title": "Ingress",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "One entry point routes by host and path to services"
+        },
+        {
+          "id": "14.9",
+          "title": "Liveness and readiness probes",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "A pod that is up but not ready gets no traffic; a stuck pod is restarted"
+        },
+        {
+          "id": "14.10",
+          "title": "Resource requests, limits and OOMKill",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Scheduler packs pods by requests; a memory spike kills one"
+        },
+        {
+          "id": "14.11",
+          "title": "Horizontal pod autoscaling",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "CPU rises, replicas increase, then settle"
+        },
+        {
+          "id": "14.12",
+          "title": "Scheduling: affinity and taints",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Pods steered to GPU nodes and kept off others"
+        },
+        {
+          "id": "14.13",
+          "title": "StatefulSets and persistent volumes",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Databases on Kubernetes keep their identity and disk across restarts"
+        },
+        {
+          "id": "14.14",
+          "title": "ConfigMaps and Secrets",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Config injected as env vars or files; rotating a secret"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "stage": 6,
+      "name": "Observability & Delivery",
+      "color": "yellow",
+      "summary": "Know what your system is doing and ship changes safely.",
+      "checkpoint": "p99 latency doubled after a deploy. Use metrics, logs and traces to find the cause.",
+      "lessons": [
+        {
+          "id": "15.1",
+          "title": "Logs, metrics and traces",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Same incident seen through each of the three lenses"
+        },
+        {
+          "id": "15.2",
+          "title": "Percentiles: why averages lie",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Average looks fine while 1 in 100 users waits 4 seconds"
+        },
+        {
+          "id": "15.3",
+          "title": "SLIs, SLOs, SLAs and error budgets",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Budget burns down during an outage; deploys freeze when it runs out"
+        },
+        {
+          "id": "15.4",
+          "title": "Alerting that does not cry wolf",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Symptom-based alerts vs noisy cause-based alerts"
+        },
+        {
+          "id": "15.5",
+          "title": "Blue-green and canary deployments",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "1% of traffic to the new version, metrics compared, then full rollout"
+        },
+        {
+          "id": "15.6",
+          "title": "CI/CD pipelines",
+          "level": "beginner",
+          "access": "pro",
+          "animation": "Commit to build, test, stage and production with gates"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "stage": 6,
+      "name": "Security by Design",
+      "color": "pink",
+      "summary": "The security questions every design review and interview asks.",
+      "checkpoint": "Secure a public API that handles payments.",
+      "lessons": [
+        {
+          "id": "16.1",
+          "title": "Authentication vs authorisation",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Who you are vs what you may do, checked at different layers"
+        },
+        {
+          "id": "16.2",
+          "title": "Password storage",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Plain text vs hash vs salted slow hash under a stolen-database attack"
+        },
+        {
+          "id": "16.3",
+          "title": "Encryption in transit and at rest",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "TLS on the wire, keys in a KMS, envelope encryption"
+        },
+        {
+          "id": "16.4",
+          "title": "Role- and attribute-based access control",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Users, roles and permissions; a policy decision for each request"
+        },
+        {
+          "id": "16.5",
+          "title": "Secrets management",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Secrets out of code, into a vault, rotated on a schedule"
+        },
+        {
+          "id": "16.6",
+          "title": "DDoS protection and WAFs",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Flood absorbed at the edge; bad patterns filtered before reaching servers"
+        },
+        {
+          "id": "16.7",
+          "title": "Common attacks: injection, XSS, CSRF",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Each attack animated, then the fix"
+        },
+        {
+          "id": "16.8",
+          "title": "Zero trust networking",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Every service call authenticated, even inside the network"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "stage": 7,
+      "name": "The System Design Interview",
+      "color": "orange",
+      "summary": "Exactly how the round works and how you are scored.",
+      "checkpoint": "Full mock: 45 minutes on a URL shortener, scored with the rubric.",
+      "lessons": [
+        {
+          "id": "17.1",
+          "title": "What the round is and how it is scored",
+          "level": "beginner",
+          "access": "free",
+          "animation": "The interviewer's rubric revealed, signal by signal"
+        },
+        {
+          "id": "17.2",
+          "title": "The four-step framework",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Requirements, estimates, high-level design, deep dive on a clock"
+        },
+        {
+          "id": "17.3",
+          "title": "Functional vs non-functional requirements",
+          "level": "beginner",
+          "access": "free",
+          "animation": "Turning a vague prompt into a short, sharp list"
+        },
+        {
+          "id": "17.4",
+          "title": "Defining the API in the interview",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "From requirements to five endpoints in five minutes"
+        },
+        {
+          "id": "17.5",
+          "title": "Data model and storage choice",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Entities, access patterns, then the database that fits"
+        },
+        {
+          "id": "17.6",
+          "title": "Drawing the high-level diagram",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Build the box-and-arrow picture in the order interviewers expect"
+        },
+        {
+          "id": "17.7",
+          "title": "Choosing your deep dives",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Find the hardest part of the problem and go there"
+        },
+        {
+          "id": "17.8",
+          "title": "Talking about trade-offs",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Every choice framed as gain, cost and when you would switch"
+        },
+        {
+          "id": "17.9",
+          "title": "Junior vs senior vs staff expectations",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "The same question answered at three levels"
+        },
+        {
+          "id": "17.10",
+          "title": "Common mistakes",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Jumping to solutions, over-engineering, silent drawing"
+        },
+        {
+          "id": "17.11",
+          "title": "Time management in 45 minutes",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "A clock overlay on a model interview"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "stage": 8,
+      "name": "Case Studies",
+      "color": "blue",
+      "summary": "Real systems designed start to finish, each with an animated architecture you can stress.",
+      "checkpoint": "Pick any unseen prompt and design it in a timed sandbox session.",
+      "lessons": [
+        {
+          "id": "18.1",
+          "title": "URL shortener",
+          "level": "beginner",
+          "access": "free",
+          "animation": "ID generation, redirect path, cache, analytics counting"
+        },
+        {
+          "id": "18.2",
+          "title": "Pastebin",
+          "level": "beginner",
+          "access": "pro",
+          "animation": "Blob storage, expiry, read-heavy caching"
+        },
+        {
+          "id": "18.3",
+          "title": "Rate limiter as a service",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Token buckets in Redis shared across many gateways"
+        },
+        {
+          "id": "18.4",
+          "title": "Unique ID generator",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Snowflake service across data centres without collisions"
+        },
+        {
+          "id": "18.5",
+          "title": "Key-value store",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Partitioning, replication, quorums and repair"
+        },
+        {
+          "id": "18.6",
+          "title": "Web crawler",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "URL frontier, politeness, dedupe with Bloom filters"
+        },
+        {
+          "id": "18.7",
+          "title": "Notification system",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Push, SMS and email fan-out with retries and user preferences"
+        },
+        {
+          "id": "18.8",
+          "title": "News feed",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Fan-out on write vs on read; the celebrity exception"
+        },
+        {
+          "id": "18.9",
+          "title": "Chat app",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "WebSocket gateways, message ordering, delivery receipts, offline sync"
+        },
+        {
+          "id": "18.10",
+          "title": "Search autocomplete",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Trie with top-k at each node; updates from query logs"
+        },
+        {
+          "id": "18.11",
+          "title": "Video platform",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Upload, transcode, adaptive bitrate streaming, CDN"
+        },
+        {
+          "id": "18.12",
+          "title": "File sync (Dropbox-style)",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Chunking, deduplication and conflict handling across devices"
+        },
+        {
+          "id": "18.13",
+          "title": "Ride sharing",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Driver locations with geohashes; matching riders in real time"
+        },
+        {
+          "id": "18.14",
+          "title": "Nearby places",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Quadtree vs geohash lookups for \"restaurants near me\""
+        },
+        {
+          "id": "18.15",
+          "title": "Ticket booking",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Seat holds with expiry; no double-selling under huge spikes"
+        },
+        {
+          "id": "18.16",
+          "title": "Payment system",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Double-entry ledger, idempotency keys and reconciliation"
+        },
+        {
+          "id": "18.17",
+          "title": "Stock exchange",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Order book and matching engine with microsecond latency"
+        },
+        {
+          "id": "18.18",
+          "title": "Photo sharing",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Upload pipeline, feed and storage tiers"
+        },
+        {
+          "id": "18.19",
+          "title": "Trending topics and top-K",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Count-min sketch and sliding windows over a firehose"
+        },
+        {
+          "id": "18.20",
+          "title": "Distributed cache",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Consistent hashing, replication and eviction at scale"
+        },
+        {
+          "id": "18.21",
+          "title": "Distributed message queue",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Building a Kafka-like log from scratch"
+        },
+        {
+          "id": "18.22",
+          "title": "Collaborative editor",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Operational transforms vs CRDTs with live cursors"
+        },
+        {
+          "id": "18.23",
+          "title": "Video conferencing",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "SFU vs MCU routing of media streams"
+        },
+        {
+          "id": "18.24",
+          "title": "Leaderboard",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Sorted sets, sharding by score range, real-time rank"
+        },
+        {
+          "id": "18.25",
+          "title": "Ad click aggregation",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Exactly-once counting with stream processing and reconciliation"
+        },
+        {
+          "id": "18.26",
+          "title": "Hotel reservation",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Inventory per night, overbooking rules, consistency"
+        },
+        {
+          "id": "18.27",
+          "title": "Email service",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Send pipeline, spam filtering, mailbox storage and search"
+        },
+        {
+          "id": "18.28",
+          "title": "Metrics and monitoring system",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Ingest millions of points per second; time-series storage and alerting"
+        },
+        {
+          "id": "18.29",
+          "title": "AI chat assistant",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Streaming tokens, GPU queues, context storage and rate limits"
+        },
+        {
+          "id": "18.30",
+          "title": "Global CDN",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Edge placement, routing, cache hierarchy and invalidation"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "stage": 8,
+      "name": "Mastery Labs",
+      "color": "green",
+      "summary": "Practice until it is second nature. This is what people pay for.",
+      "checkpoint": "Earn the Mastery certificate: pass three labs and two timed mock interviews.",
+      "lessons": [
+        {
+          "id": "19.1",
+          "title": "Design sandbox",
+          "level": "intermediate",
+          "access": "free",
+          "animation": "Drag components onto a canvas, send simulated traffic and watch bottlenecks glow"
+        },
+        {
+          "id": "19.2",
+          "title": "Scale challenges",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Your design must survive 10×, then 100× traffic; fix what breaks"
+        },
+        {
+          "id": "19.3",
+          "title": "Incident drills",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "A live system misbehaves; read the dashboards and find the cause"
+        },
+        {
+          "id": "19.4",
+          "title": "Estimation speed runs",
+          "level": "intermediate",
+          "access": "pro",
+          "animation": "Timed napkin-math rounds with instant feedback"
+        },
+        {
+          "id": "19.5",
+          "title": "Trade-off duels",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Two designs, one requirement; argue which wins and why"
+        },
+        {
+          "id": "19.6",
+          "title": "Spaced review deck",
+          "level": "beginner",
+          "access": "pro",
+          "animation": "Daily cards from every lesson you finished"
+        },
+        {
+          "id": "19.7",
+          "title": "Timed mock interviews",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "45-minute rounds with a rubric, model answer and AI feedback"
+        },
+        {
+          "id": "19.8",
+          "title": "Architecture teardown library",
+          "level": "advanced",
+          "access": "pro",
+          "animation": "Annotated walk-throughs of famous engineering blog posts"
+        }
+      ]
+    }
+  ]
+}
