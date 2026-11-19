@@ -3,7 +3,7 @@ import { f, hopPath, P, toward, type Pt } from "./geometry";
 import { INK, PACKETS } from "./palette";
 import { EntityView, Pill } from "./primitives";
 import { SceneDefs } from "./SceneDefs";
-import type { Entity, LabelDef, LinkDef, PacketDef, SceneDef, StepDef, XY } from "./types";
+import type { Entity, LabelDef, LinkDef, PacketDef, SceneDef, StepDef, TokenRowDef, XY } from "./types";
 
 /*
  * Scenes animate with SVG's built-in timeline (SMIL). Every timed element begins
@@ -18,6 +18,7 @@ export function stepDuration(step: StepDef): number {
   for (const p of step.packets ?? []) end = Math.max(end, p.at + (p.dur ?? DEFAULT_DUR) + 0.4);
   for (const l of step.labels ?? []) end = Math.max(end, l.until ?? (l.from ?? 0) + 0.6);
   for (const l of step.links ?? []) end = Math.max(end, (l.from_t ?? 0) + 0.4);
+  for (const r of step.tokens ?? []) for (const t of r.items) end = Math.max(end, t.until ?? (t.from ?? 0) + 0.4);
   return Math.max(3, end + (step.hold ?? 1.8));
 }
 
@@ -129,23 +130,27 @@ function PacketShape({ kind }: { kind: PacketDef["kind"] }) {
 function Packet({ def, points }: { def: PacketDef; points: Record<string, XY> }) {
   const pts = def.path.map((n) => resolve(points, n));
   const dur = def.dur ?? DEFAULT_DUR;
-  const end = def.at + dur;
-  const last = pts[pts.length - 1];
   const glow = PACKETS[def.kind].glow;
+  const lostAt = def.lost ? (typeof def.lost === "number" ? def.lost : 0.55) : 1;
+  const travel = dur * lostAt;
+  const end = def.at + travel;
+  const path = hopPath(pts);
+  // Where the packet stops: measured on the real path once mounted is overkill, so walk the hops linearly.
+  const stop = pointAlong(pts, lostAt);
   return (
     <g>
       <g opacity={0}>
         <set attributeName="opacity" to="1" begin={s(def.at)} />
         <set attributeName="opacity" to="0" begin={s(end)} />
         <animateMotion
-          path={hopPath(pts)}
+          path={path}
           begin={s(def.at)}
-          dur={s(dur)}
+          dur={s(travel)}
           fill="freeze"
           calcMode="spline"
-          keyPoints="0;1"
+          keyPoints={`0;${f(lostAt)}`}
           keyTimes="0;1"
-          keySplines="0.45 0 0.55 1"
+          keySplines={def.lost ? "0.3 0 0.7 1" : "0.45 0 0.55 1"}
         />
         <PacketShape kind={def.kind} />
         {def.tag && (
@@ -154,10 +159,52 @@ function Packet({ def, points }: { def: PacketDef; points: Record<string, XY> })
           </g>
         )}
       </g>
-      <circle cx={last.x} cy={last.y} r={9} fill="none" stroke={glow} strokeWidth={2.5} opacity={0}>
-        <animate attributeName="r" values="9;28" dur="0.6s" begin={s(end)} fill="freeze" />
-        <animate attributeName="opacity" values="0.9;0" dur="0.6s" begin={s(end)} fill="freeze" />
-      </circle>
+      {def.lost ? (
+        <g transform={`translate(${f(stop.x)} ${f(stop.y - 8)})`} opacity={0}>
+          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.7;1" dur="1.4s" begin={s(end)} fill="freeze" />
+          <circle r={11} fill="#f6dbe4" stroke="#c0392b" strokeWidth={2} />
+          <path d="M-4.5,-4.5 L4.5,4.5 M4.5,-4.5 L-4.5,4.5" stroke="#c0392b" strokeWidth={2.6} strokeLinecap="round" />
+        </g>
+      ) : (
+        <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r={9} fill="none" stroke={glow} strokeWidth={2.5} opacity={0}>
+          <animate attributeName="r" values="9;28" dur="0.6s" begin={s(end)} fill="freeze" />
+          <animate attributeName="opacity" values="0.9;0" dur="0.6s" begin={s(end)} fill="freeze" />
+        </circle>
+      )}
+    </g>
+  );
+}
+
+function pointAlong(pts: Pt[], t: number): Pt {
+  const lens = pts.slice(1).map((p, i) => Math.hypot(p.x - pts[i].x, p.y - pts[i].y));
+  let left = lens.reduce((a, b) => a + b, 0) * t;
+  for (let i = 0; i < lens.length; i++) {
+    if (left <= lens[i]) {
+      const k = lens[i] ? left / lens[i] : 0;
+      return P(pts[i].x + (pts[i + 1].x - pts[i].x) * k, pts[i].y + (pts[i + 1].y - pts[i].y) * k - 18 * Math.sin(Math.PI * k));
+    }
+    left -= lens[i];
+  }
+  return pts[pts.length - 1];
+}
+
+function TokenRow({ def, points }: { def: TokenRowDef; points: Record<string, XY> }) {
+  const p = resolve(points, def.at);
+  const [gx, gy] = def.gap ?? [22, 11];
+  return (
+    <g>
+      {def.items.map((t, i) => (
+        <g key={i} transform={`translate(${f(p.x + gx * i)} ${f(p.y + gy * i)})`}>
+          <Appear from={t.from} until={t.until}>
+            <PacketShape kind={t.kind} />
+            {t.tag && (
+              <g transform="translate(0 -20)">
+                <Pill x={0} y={0} text={t.tag} size={10} weight={700} />
+              </g>
+            )}
+          </Appear>
+        </g>
+      ))}
     </g>
   );
 }
@@ -192,6 +239,7 @@ export function Scene({
       <g>{scene.entities.filter((e) => focus.has(e.id)).map((e) => <FocusRing key={e.id} e={e} />)}</g>
       <g>{(step.links ?? []).map((l, i) => <Link key={i} def={l} points={points} />)}</g>
       <g>{ordered.map((e) => <EntityView key={e.id} e={e} screen={step.screen} />)}</g>
+      <g>{(step.tokens ?? []).map((r, i) => <TokenRow key={i} def={r} points={points} />)}</g>
       <g>{(step.packets ?? []).map((p, i) => <Packet key={i} def={p} points={points} />)}</g>
       <g>{(step.labels ?? []).map((l, i) => <Label key={i} def={l} points={points} />)}</g>
     </svg>

@@ -1,6 +1,6 @@
 # System Design Explained: product plan
 
-Status: Phase 1 done (app foundation, scene engine, lesson player, course map, lesson 1.1). Next: Phase 2.
+Status: Phase 1 done. Phase 2 in progress: Track 1 (How the Internet Works, 11 lessons) finished. Next: Tracks 2, 3, 4 and 18 basics.
 Domain: **systemdesignexplained.com** (chosen; `.dev` and `.app` were also free at the time of checking).
 
 ## 1. What we are building

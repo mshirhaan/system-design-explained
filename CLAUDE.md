@@ -26,6 +26,7 @@ seconds from the start of a step. The player restarts, pauses and resumes a step
    the lesson's slug from the curriculum (its title, slugified).
 2. Register it in `content/lessons/index.ts`.
 3. Entities draw in the order listed (put back-most first). Points are named screen coordinates used by packets, links and labels.
+   Packets can be `lost` (dropped partway with a red cross); `tokens` draw rows of still packets for queues and buffers.
 4. Check it in a browser at desktop and phone width (no horizontal page scroll; the scene may scroll inside its own box).
 
 ## Rules

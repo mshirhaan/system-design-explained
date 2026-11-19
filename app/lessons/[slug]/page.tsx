@@ -6,7 +6,7 @@ import { Quiz } from "@/components/player/Quiz";
 import { Scene } from "@/components/scene/Scene";
 import type { SceneDef } from "@/components/scene/types";
 import { TrackCube } from "@/components/site/TrackCube";
-import { builtSlugs, loadLesson } from "@/content/lessons";
+import { builtSlugs, hasContent, loadLesson } from "@/content/lessons";
 import { canAccess, getViewer, paywallEnabled } from "@/lib/access";
 import { getLessonBySlug, getStage, getTrack, lessons, levelLabel, neighbours, type TrackColor } from "@/lib/curriculum";
 import { site } from "@/lib/site";
@@ -87,7 +87,11 @@ export default async function LessonPage({ params }: Props) {
         <Locked color={track.color} title={lesson.title} animation={lesson.animation} />
       ) : content ? (
         <>
-          <LessonPlayer lesson={content} title={lesson.title} />
+          <LessonPlayer
+            lesson={content}
+            title={lesson.title}
+            nextLesson={next && hasContent(next.slug) ? { href: `/lessons/${next.slug}`, title: next.title } : undefined}
+          />
           <div className="lesson-body">
             <div style={{ display: "grid", gap: 16, minWidth: 0 }}>
               <article className="article card">

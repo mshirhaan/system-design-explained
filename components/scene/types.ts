@@ -44,6 +44,16 @@ export interface PacketDef {
   dur?: number;
   /** Small tag that rides with the packet. */
   tag?: string;
+  /** The packet is dropped partway along its path (0–1, default 0.55) and vanishes with a red cross. */
+  lost?: boolean | number;
+}
+
+/** A row of packets sitting still at a point, such as a queue or a buffer. */
+export interface TokenRowDef {
+  at: string | XY;
+  /** Offset between items. Defaults to a step along the floor to the right. */
+  gap?: XY;
+  items: { kind: PacketKind; tag?: string; from?: number; until?: number }[];
 }
 
 export interface LabelDef {
@@ -78,6 +88,7 @@ export interface StepDef {
   note?: string;
   links?: LinkDef[];
   packets?: PacketDef[];
+  tokens?: TokenRowDef[];
   labels?: LabelDef[];
   /** Entities that get a pulsing ring this step. */
   focus?: string[];

@@ -1,12 +1,21 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Scene, stepDuration } from "@/components/scene/Scene";
 import type { LessonContent } from "@/components/scene/types";
 import { TimingBar } from "./TimingBar";
 import { useSceneClock } from "./useSceneClock";
 
-export function LessonPlayer({ lesson, title }: { lesson: LessonContent; title: string }) {
+export function LessonPlayer({
+  lesson,
+  title,
+  nextLesson,
+}: {
+  lesson: LessonContent;
+  title: string;
+  nextLesson?: { href: string; title: string };
+}) {
   const steps = lesson.steps;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -88,7 +97,7 @@ export function LessonPlayer({ lesson, title }: { lesson: LessonContent; title: 
             </label>
           </div>
         </div>
-        <div className="scene-wrap">
+        <div className="scene-wrap" data-duration={duration}>
           <Scene key={`${index}-${replays}`} scene={lesson.scene} step={step} label={`${title}, step ${index + 1}: ${step.title}`} svgRef={svgRef} className="scene" />
         </div>
         {lesson.phases && <TimingBar phases={lesson.phases} timing={step.timing} />}
@@ -137,9 +146,15 @@ export function LessonPlayer({ lesson, title }: { lesson: LessonContent; title: 
           <button className="btn" onClick={() => go(index - 1)} disabled={index === 0}>
             ← Back
           </button>
-          <button className="btn btn-primary" onClick={() => go(index + 1)} disabled={last}>
-            {last ? "Finished" : `Next: ${steps[index + 1].title}`} {!last && "→"}
-          </button>
+          {last && nextLesson ? (
+            <Link className="btn btn-primary" href={nextLesson.href}>
+              Next lesson: {nextLesson.title} →
+            </Link>
+          ) : (
+            <button className="btn btn-primary" onClick={() => go(index + 1)} disabled={last}>
+              {last ? "Finished" : `Next: ${steps[index + 1].title}`} {!last && "→"}
+            </button>
+          )}
         </div>
         <p className="kbd-hint">
           <kbd>←</kbd> <kbd>→</kbd> step · <kbd>Space</kbd> pause · <kbd>R</kbd> replay
