@@ -1,6 +1,6 @@
 # System Design Explained: product plan
 
-Status: planning finished, Phase 1 not started.
+Status: Phase 1 done (app foundation, scene engine, lesson player, course map, lesson 1.1). Next: Phase 2.
 Domain: **systemdesignexplained.com** (chosen; `.dev` and `.app` were also free at the time of checking).
 
 ## 1. What we are building
@@ -21,7 +21,7 @@ Each track ends with a **checkpoint** challenge.
 
 ## 2. Curriculum
 
-Full list: [`curriculum.json`](./curriculum.json). Browsable version: [`prototypes/curriculum-map.html`](./prototypes/curriculum-map.html).
+Full list: [`content/curriculum.json`](../content/curriculum.json). Browsable version: [`prototypes/curriculum-map.html`](./prototypes/curriculum-map.html).
 
 - 8 stages, 19 tracks, 227 lessons, 19 checkpoints, about 55 hours.
 - 37 free lessons, 190 Pro.
@@ -96,13 +96,16 @@ We keep the *style* but must not copy designed-to-scale.vercel.app's lessons, br
 
 ## 7. Build phases
 
-1. **Foundation:** project setup, design system, scene engine, lesson player, course map, and lesson 1.1 "What happens when you press Enter". Paywall off.
+1. **Foundation (done):** project setup, design system, scene engine, lesson player, course map, and lesson 1.1 "What happens when you press Enter". Paywall off.
 2. **Beginner path:** the rest of track 1, plus tracks 2, 3, 4 and 18 (basics). All open, then test with real people.
 3. **Accounts and progress** (Supabase).
 4. **Payments, then switch the paywall on.**
 5. **Deep dives:** Inside a Database first (most visual, rarest elsewhere), then Redis, Kafka, Kubernetes…
 6. **Case studies, Mastery Labs** (sandbox, drills, mock interviews).
 
-## 8. Housekeeping
+## 8. How lessons are built
 
-- Delete the leftover `access-check` branch on GitHub and set the default branch to `main`.
+See `CLAUDE.md` for the code layout. In short: each finished lesson is a data file in `content/lessons/`
+(scene layout, steps, packets, labels, timing phases, quiz and written article), registered in
+`content/lessons/index.ts`. Lessons without a file show a "coming soon" page with their description,
+so all 227 URLs exist from day one for SEO.
