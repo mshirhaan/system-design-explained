@@ -13,6 +13,7 @@ export function SiteHeader() {
         </Link>
         <nav className="site-nav" aria-label="Main">
           <Link href="/course">Course</Link>
+          <Link href="/labs">Labs</Link>
           <Link href="/#how-it-works">How it works</Link>
           <Link href="/#pricing">Pricing</Link>
           <Link href="/lessons/what-happens-when-you-press-enter" className="btn btn-primary btn-sm">

@@ -15,6 +15,8 @@ Read before working:
 - `components/player/`: `LessonPlayer` (steps, controls, narration), `useSceneClock` (drives the SVG timeline), `TimingBar`, `Quiz`, `LoopingScene` (preview loops).
 - `content/lessons/`: one file per finished lesson, registered in `content/lessons/index.ts` by slug.
 - `lib/curriculum.ts` (typed curriculum, slugs), `lib/access.ts` (server-only paywall check), `lib/site.ts`.
+- `app/labs/`, `components/lab/Sandbox.tsx`, `lib/lab/`: Mastery Labs. The Design Sandbox's traffic model (`lib/lab/model.ts`) is pure and
+  testable; challenges (`lib/lab/challenges.ts`) are goals checked against its result. Keep every challenge solvable within budget.
 
 ## How animation works
 Scenes are SVG. Every timed element uses SVG's built-in timeline (SMIL: `<animate>`, `<animateMotion>`, `<set>`), with times in
