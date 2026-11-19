@@ -126,6 +126,22 @@ export function LessonPlayer({
           </span>
           {last && <span className="tag tag-green">Recap</span>}
         </div>
+        {/* Navigation sits at the top so it never moves when the step text is longer or shorter. */}
+        <div className="narr-nav">
+          <button className="btn" onClick={() => go(index - 1)} disabled={index === 0}>
+            ← Back
+          </button>
+          {last && nextLesson ? (
+            <Link className="btn btn-primary" href={nextLesson.href}>
+              Next lesson →
+            </Link>
+          ) : (
+            <button className="btn btn-primary" onClick={() => go(index + 1)} disabled={last}>
+              {last ? "Finished" : "Next →"}
+            </button>
+          )}
+        </div>
+        <p className="narr-upnext">{last ? (nextLesson ? `Next lesson: ${nextLesson.title}` : "You've reached the end of this lesson") : `Up next: ${steps[index + 1].title}`}</p>
         <div className="narr-text" key={index}>
           <h2>{step.title}</h2>
           <p>{step.body}</p>
@@ -143,20 +159,6 @@ export function LessonPlayer({
             </div>
           </div>
         )}
-        <div className="narr-nav">
-          <button className="btn" onClick={() => go(index - 1)} disabled={index === 0}>
-            ← Back
-          </button>
-          {last && nextLesson ? (
-            <Link className="btn btn-primary" href={nextLesson.href}>
-              Next lesson: {nextLesson.title} →
-            </Link>
-          ) : (
-            <button className="btn btn-primary" onClick={() => go(index + 1)} disabled={last}>
-              {last ? "Finished" : `Next: ${steps[index + 1].title}`} {!last && "→"}
-            </button>
-          )}
-        </div>
         <p className="kbd-hint">
           <kbd>←</kbd> <kbd>→</kbd> step · <kbd>Space</kbd> pause · <kbd>R</kbd> replay
         </p>
