@@ -101,7 +101,7 @@ We keep the *style* but must not copy designed-to-scale.vercel.app's lessons, br
 3. **Accounts and progress** (Supabase).
 4. **Payments, then switch the paywall on.**
 5. **Deep dives:** Inside a Database first (most visual, rarest elsewhere), then Redis, Kafka, Kubernetes…
-6. **Case studies, Mastery Labs** (sandbox, drills, mock interviews). The Design Sandbox with three scale challenges is built (`/labs/sandbox`); its traffic model lives in `lib/lab/model.ts` and challenges in `lib/lab/challenges.ts`.
+6. **Case studies, Mastery Labs** (sandbox, drills, mock interviews). The Design Studio is built (`/labs/sandbox`): infinite canvas, 8 blocks (users, CDN, load balancer, app servers, cache, queue & workers, database, replicas) with instances and sizes, autoscaling, failure injection, 24-hour runs with charts, 8 challenges with stars, saved progress and share links.
 
 ## 8. How lessons are built
 

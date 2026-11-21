@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 };
 
 const LABS: { title: string; text: string; color: TrackColor; href?: string }[] = [
-  { title: "Design Sandbox", text: "Build a system from blocks, send it traffic and watch where it breaks. Includes three scale challenges.", color: "blue", href: "/labs/sandbox" },
-  { title: "Scale challenges", text: "Your design must survive 10×, then 100× traffic, on a budget. Fix whatever breaks.", color: "green", href: "/labs/sandbox" },
+  { title: "Design Studio", text: "An infinite canvas to build systems from real components, send them live traffic, run a full 24-hour day and break things on purpose.", color: "blue", href: "/labs/sandbox" },
+  { title: "Scale challenges", text: "Eight challenges with stars: launch day, going viral, too many writes, surviving a crash, a flash sale and a chaos day.", color: "green", href: "/labs/sandbox" },
   { title: "Incident drills", text: "A live system misbehaves. Read the dashboards, find the cause, apply the fix.", color: "orange" },
   { title: "Estimation speed runs", text: "Timed back-of-the-envelope rounds: users, requests per second, storage and bandwidth.", color: "yellow" },
   { title: "Trade-off duels", text: "Two designs, one requirement. Decide which wins and explain why.", color: "purple" },
@@ -28,7 +28,7 @@ export default function LabsPage() {
         <h1>
           Practise until it's <mark>second nature</mark>.
         </h1>
-        <p>Lessons explain how systems work. Labs make you build, break and fix them yourself. Start with the Design Sandbox.</p>
+        <p>Lessons explain how systems work. Labs make you build, break and fix them yourself. Start with the Design Studio.</p>
       </header>
       <div className="labs-grid">
         {LABS.map((l) => {

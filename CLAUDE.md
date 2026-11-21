@@ -15,8 +15,14 @@ Read before working:
 - `components/player/`: `LessonPlayer` (steps, controls, narration), `useSceneClock` (drives the SVG timeline), `TimingBar`, `Quiz`, `LoopingScene` (preview loops).
 - `content/lessons/`: one file per finished lesson, registered in `content/lessons/index.ts` by slug.
 - `lib/curriculum.ts` (typed curriculum, slugs), `lib/access.ts` (server-only paywall check), `lib/site.ts`.
-- `app/labs/`, `components/lab/Sandbox.tsx`, `lib/lab/`: Mastery Labs. The Design Sandbox's traffic model (`lib/lab/model.ts`) is pure and
-  testable; challenges (`lib/lab/challenges.ts`) are goals checked against its result. Keep every challenge solvable within budget.
+- `app/labs/`, `components/lab/`, `lib/lab/`: Mastery Labs. The Design Studio (`/labs/sandbox`) is an infinite-canvas simulator:
+  - `lib/lab/catalog.ts`: block kinds, sizes, capacities, costs, allowed connections, "Learn" lesson links.
+  - `lib/lab/model.ts`: pure traffic model (static/read/write flows, instances, failures, health checks, queues). `simulate()`.
+  - `lib/lab/run.ts`: 24-hour runs (traffic profiles, target-tracking autoscaling with boot delay, scheduled failures, backlog).
+  - `lib/lab/challenges.ts`: challenges, goals and star thresholds. Every challenge must stay solvable within budget; check
+    with a calibration script (simulate candidate designs) after changing numbers.
+  - `components/lab/Studio.tsx` (state, undo/redo, panels, run loop, persistence, share links), `Board.tsx` (pan/zoom canvas,
+    drag, connect handles, marquee), `art.tsx`, `Charts.tsx`.
 
 ## How animation works
 Scenes are SVG. Every timed element uses SVG's built-in timeline (SMIL: `<animate>`, `<animateMotion>`, `<set>`), with times in
