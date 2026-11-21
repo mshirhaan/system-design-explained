@@ -6,9 +6,10 @@ import { ALLOWED, KINDS, LEARN, PALETTE, SIZE_LABEL, sizesOf, spec, type NodeKin
 import { CHALLENGES, costOf, node as makeNode, starsFor, withFailure, type Challenge, type GoalCtx } from "@/lib/lab/challenges";
 import { DEFAULT_WORKLOAD, canConnect, simulate, type Design, type LabNode, type Workload } from "@/lib/lab/model";
 import { PROFILES, clock, startRun, stepRun, summarise, type RunState } from "@/lib/lab/run";
+import { TEMPLATES } from "@/lib/lab/templates";
 import { SceneDefs } from "@/components/scene/SceneDefs";
 import { NodeArt } from "./art";
-import { Board, CELL, MAX_ZOOM, MIN_ZOOM, gridToWorld, worldToGrid, type Selection, type View } from "./Board";
+import { Board, CELL, MAX_ZOOM, MIN_ZOOM, gridToWorld, noteSize, worldToGrid, type Selection, type View } from "./Board";
 import { DayChart, Sparkline } from "./Charts";
 
 /* ---------------- helpers ---------------- */
@@ -48,13 +49,18 @@ const writeStore = (s: Stored) => {
 
 let uid = 0;
 const newId = (p: string) => `${p}-${Date.now().toString(36)}${(uid++).toString(36)}`;
-const clone = (d: Design): Design => ({ nodes: d.nodes.map((n) => ({ ...n, autoscale: n.autoscale ? { ...n.autoscale } : undefined })), edges: d.edges.map((e) => ({ ...e })) });
+const clone = (d: Design): Design => ({
+  nodes: d.nodes.map((n) => ({ ...n, autoscale: n.autoscale ? { ...n.autoscale } : undefined })),
+  edges: d.edges.map((e) => ({ ...e })),
+  notes: (d.notes ?? []).map((n) => ({ ...n })),
+});
 
 function encodeDesign(mode: string, d: Design): string {
   const compact = {
     m: mode,
     n: d.nodes.map((n) => [n.id, n.kind, n.gx, n.gy, n.count, n.size, n.autoscale?.on ? [n.autoscale.min, n.autoscale.max] : 0]),
     e: d.edges.map((e) => [e.from, e.to]),
+    t: (d.notes ?? []).map((n) => [Math.round(n.x), Math.round(n.y), n.text]),
   };
   return btoa(unescape(encodeURIComponent(JSON.stringify(compact)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
@@ -67,7 +73,8 @@ function decodeDesign(s: string): { mode: string; design: Design } | null {
     }));
     const edges = json.e.map((a: [string, string], i: number) => ({ id: `e${i}-${a[0]}-${a[1]}`, from: a[0], to: a[1] }));
     if (!nodes.every((n) => n.kind in KINDS)) return null;
-    return { mode: json.m, design: { nodes, edges } };
+    const notes = (json.t ?? []).map((a: [number, number, string], i: number) => ({ id: `note-${i}`, x: a[0], y: a[1], text: String(a[2]).slice(0, 400) }));
+    return { mode: json.m, design: { nodes, edges, notes } };
   } catch {
     return null;
   }
@@ -92,7 +99,8 @@ export function Studio() {
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [panel, setPanel] = useState<"goals" | "inspect" | "workload" | "log">("goals");
-  const [menu, setMenu] = useState<{ x: number; y: number; node?: string; edge?: string; quick?: { from: string | null; gx: number; gy: number } } | null>(null);
+  const [menu, setMenu] = useState<MenuState | null>(null);
+  const [editing, setEditing] = useState<{ id: string; text: string } | null>(null);
   const [toast, setToast] = useState<{ text: string; tone: "info" | "bad" | "good" } | null>(null);
   const [store, setStore] = useState<Stored>({ stars: {}, designs: {} });
   const [picker, setPicker] = useState(false);
@@ -343,7 +351,10 @@ export function Studio() {
   };
 
   const removeSelection = () => {
-    if (selection.edge) {
+    if (selection.note) {
+      const id = selection.note;
+      commit((d) => ({ ...d, notes: (d.notes ?? []).filter((n) => n.id !== id) }));
+    } else if (selection.edge) {
       const id = selection.edge;
       commit((d) => ({ ...d, edges: d.edges.filter((e) => e.id !== id) }));
     } else if (selection.nodes.length) {
@@ -422,6 +433,55 @@ export function Studio() {
   const anyFailed = design.nodes.some((n) => n.failed > 0);
   const recoverAll = () => commit((d) => ({ ...d, nodes: d.nodes.map((n) => ({ ...n, failed: 0 })) }));
 
+  /* ----- notes ----- */
+  const addNote = (wx: number, wy: number) => {
+    const id = newId("note");
+    commit((d) => ({ ...d, notes: [...(d.notes ?? []), { id, x: Math.round(wx - 60), y: Math.round(wy - 20), text: "" }] }));
+    setSelection({ nodes: [], edge: null, note: id });
+    setEditing({ id, text: "" });
+  };
+  const saveNote = () => {
+    if (!editing) return;
+    const text = editing.text.trim();
+    const id = editing.id;
+    commit((d) => ({ ...d, notes: text ? (d.notes ?? []).map((n) => (n.id === id ? { ...n, text } : n)) : (d.notes ?? []).filter((n) => n.id !== id) }));
+    setEditing(null);
+  };
+  const viewCenterWorld = () => {
+    const { w, h } = boardSize.current;
+    return { x: (w / 2 - view.x) / view.k, y: (h / 2 - view.y) / view.k };
+  };
+
+  /* ----- image export ----- */
+  const downloadImage = () => {
+    const svg = rootRef.current?.querySelector(".board-svg") as SVGSVGElement | null;
+    if (!svg) return;
+    const copy = svg.cloneNode(true) as SVGSVGElement;
+    copy.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
+    style.textContent = ".st{font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;fill:#1d1b18}";
+    copy.insertBefore(style, copy.firstChild);
+    const w = Number(svg.getAttribute("width"));
+    const h = Number(svg.getAttribute("height"));
+    const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copy)], { type: "image/svg+xml" }));
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = w * 2;
+      c.height = h * 2;
+      const ctx2 = c.getContext("2d")!;
+      ctx2.scale(2, 2);
+      ctx2.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      const a = document.createElement("a");
+      a.download = `${ch ? ch.id : "my-design"}.png`;
+      a.href = c.toDataURL("image/png");
+      a.click();
+      say("Image saved.", "good");
+    };
+    img.src = url;
+  };
+
   const share = async () => {
     const url = `${location.origin}${location.pathname}#d=${encodeDesign(modeKey(mode), design)}`;
     try {
@@ -459,7 +519,8 @@ export function Studio() {
       else if (mod && key === "d") (e.preventDefault(), duplicate());
       else if (mod && key === "a") (e.preventDefault(), setSelection({ nodes: design.nodes.map((n) => n.id), edge: null }));
       else if (key === "delete" || key === "backspace") removeSelection();
-      else if (key === "escape") (setSelection({ nodes: [], edge: null }), setMenu(null), setHelp(false), setPicker(false), setReport(false));
+      else if (key === "escape") (setSelection({ nodes: [], edge: null }), setMenu(null), setHelp(false), setPicker(false), setReport(false), setEditing(null));
+      else if (key === "n" && !mod) (e.preventDefault(), addNote(viewCenterWorld().x, viewCenterWorld().y));
       else if (key === "f") fit();
       else if (key === "=" || key === "+") zoomBy(1.2);
       else if (key === "-") zoomBy(1 / 1.2);
@@ -565,6 +626,7 @@ export function Studio() {
           <IconBtn label="Redo (Ctrl+Shift+Z)" onClick={redo} disabled={!future.current.length} d="m15 14 5-5-5-5M20 9H10a6 6 0 0 0 0 12h3" />
           <IconBtn label="Tidy up the layout" onClick={tidy} d="M4 6h16M4 12h10M4 18h6" />
           <IconBtn label="Fit everything in view (F)" onClick={() => fit()} d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+          <IconBtn label="Download the canvas as an image" onClick={downloadImage} d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
           <IconBtn label="Copy a share link" onClick={share} d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 0 0-5.6-5.6l-1 1M14 10a4 4 0 0 0-5.6 0l-3 3a4 4 0 0 0 5.6 5.6l1-1" />
           <IconBtn label="Keyboard shortcuts and tips (?)" onClick={() => setHelp(true)} d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z" />
           <IconBtn label="Full screen" onClick={fullscreen} d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
@@ -587,6 +649,9 @@ export function Studio() {
             onQuickAdd={(from, gx, gy, cx, cy) => setMenu({ x: cx, y: cy, quick: { from, gx, gy } })}
             onDropKind={(kind, gx, gy) => addNode(kind, { gx, gy })}
             onContext={(t, x, y) => setMenu({ x, y, ...t })}
+            onCanvasMenu={(gx, gy, wx, wy, x, y) => setMenu({ x, y, canvas: { gx, gy, wx, wy } })}
+            onMoveNote={(id, x, y) => commit((d) => ({ ...d, notes: (d.notes ?? []).map((n) => (n.id === id ? { ...n, x, y } : n)) }))}
+            onEditNote={(id) => setEditing({ id, text: design.notes?.find((n) => n.id === id)?.text ?? "" })}
             onSize={(w, h) => (boardSize.current = { w, h })}
           />
 
@@ -622,7 +687,18 @@ export function Studio() {
                     </button>
                   );
                 })}
-                <p className="studio-tip">Drag a block onto the canvas. Drag from a block's ＋ handle to connect it.</p>
+                <button className="studio-part studio-part-note" onClick={() => addNote(viewCenterWorld().x, viewCenterWorld().y)} title="Add a sticky note (N)">
+                  <svg viewBox="-30 -26 60 52" aria-hidden="true">
+                    <rect x={-20} y={-15} width={40} height={30} rx={4} fill="#1d1b18" transform="translate(2 3)" />
+                    <rect x={-20} y={-15} width={40} height={30} rx={4} fill="#fff4d8" stroke="#1d1b18" strokeWidth={1.6} />
+                    <path d="M-12,-5 H10 M-12,3 H4" stroke="#a59c90" strokeWidth={2} strokeLinecap="round" />
+                  </svg>
+                  <span>
+                    <b>Note</b>
+                    <small>write on the canvas</small>
+                  </span>
+                </button>
+                <p className="studio-tip">Drag a block onto the canvas. Drag from a block's ＋ handle to connect it. Right-click empty space for more.</p>
               </div>
             )}
           </aside>
@@ -649,12 +725,39 @@ export function Studio() {
 
           {toast && <div className={`studio-toast is-${toast.tone}`} role="status">{toast.text}</div>}
 
+          {editing && (() => {
+            const nt = design.notes?.find((n) => n.id === editing.id);
+            if (!nt) return null;
+            const { w } = noteSize(nt.text || "New note text here");
+            return (
+              <div className="note-editor" style={{ left: nt.x * view.k + view.x, top: nt.y * view.k + view.y }}>
+                <textarea
+                  id="note-editor"
+                  autoFocus
+                  value={editing.text}
+                  placeholder="Write a note…"
+                  style={{ width: Math.max(220, w * view.k) }}
+                  onChange={(e) => setEditing({ ...editing, text: e.target.value })}
+                  onBlur={saveNote}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") (e.preventDefault(), saveNote());
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) (e.preventDefault(), saveNote());
+                  }}
+                />
+                <small>Ctrl+Enter or click outside to save</small>
+              </div>
+            );
+          })()}
+
           {menu && (
             <ContextMenu
               menu={menu}
               design={design}
               onClose={() => setMenu(null)}
               actions={{
+                addNote,
+                editNote: (id) => setEditing({ id, text: design.notes?.find((n) => n.id === id)?.text ?? "" }),
+                removeNote: (id) => commit((d) => ({ ...d, notes: (d.notes ?? []).filter((n) => n.id !== id) })),
                 add: (kind, at, from) => addNode(kind, at, from),
                 duplicate,
                 remove: removeSelection,
@@ -687,6 +790,10 @@ export function Studio() {
                 onFocus={(id) => (setSelection({ nodes: [id], edge: null }))}
                 onReset={resetChallenge}
                 onNext={() => mode.kind === "challenge" && mode.index < CHALLENGES.length - 1 && loadMode({ kind: "challenge", index: mode.index + 1 })}
+                onTemplate={(d) => {
+                  commit(clone(d));
+                  window.setTimeout(() => fit(d), 30);
+                }}
                 hasNext={mode.kind === "challenge" && mode.index < CHALLENGES.length - 1}
                 run={run}
               />
@@ -814,7 +921,8 @@ export function Studio() {
                   <li><b>Add</b>: drag a block from the left, or click it</li>
                   <li><b>Connect</b>: drag from a block's ＋ handle onto another block, or onto empty space to create one</li>
                   <li><b>Group</b>: select a block and press + for more instances</li>
-                  <li><b>Menu</b>: right-click a block or arrow</li>
+                  <li><b>Menu</b>: right-click a block, an arrow or empty space</li>
+                  <li><b>Notes</b>: press <kbd>N</kbd>, double-click a note to edit it</li>
                 </ul>
               </div>
               <div>
@@ -915,16 +1023,29 @@ function Minimap({ design, view, size, onView, sim }: { design: Design; view: Vi
   );
 }
 
+type MenuState = {
+  x: number;
+  y: number;
+  node?: string;
+  edge?: string;
+  note?: string;
+  quick?: { from: string | null; gx: number; gy: number };
+  canvas?: { gx: number; gy: number; wx: number; wy: number };
+};
+
 function ContextMenu({
   menu,
   design,
   onClose,
   actions,
 }: {
-  menu: { x: number; y: number; node?: string; edge?: string; quick?: { from: string | null; gx: number; gy: number } };
+  menu: MenuState;
   design: Design;
   onClose: () => void;
   actions: {
+    addNote: (wx: number, wy: number) => void;
+    editNote: (id: string) => void;
+    removeNote: (id: string) => void;
     add: (kind: NodeKind, at: { gx: number; gy: number }, from: string | null) => void;
     duplicate: () => void;
     remove: () => void;
@@ -975,6 +1096,22 @@ function ContextMenu({
         </>
       )}
       {menu.edge && item("Delete connection", () => actions.removeEdge(menu.edge!), true)}
+      {menu.note && (
+        <>
+          <p className="menu-title">Note</p>
+          {item("Edit note", () => actions.editNote(menu.note!))}
+          {item("Delete note", () => actions.removeNote(menu.note!), true)}
+        </>
+      )}
+      {menu.canvas && (
+        <>
+          <p className="menu-title">Add here</p>
+          {item("A note", () => actions.addNote(menu.canvas!.wx, menu.canvas!.wy))}
+          {PALETTE.filter((k) => k !== "users" || !design.nodes.some((n) => n.kind === "users")).map((k) =>
+            item(KINDS[k].label, () => actions.add(k, { gx: menu.canvas!.gx, gy: menu.canvas!.gy }, null)),
+          )}
+        </>
+      )}
     </div>
   );
 }
@@ -992,6 +1129,7 @@ function GoalsPanel(props: {
   onNext: () => void;
   hasNext: boolean;
   run: RunState | null;
+  onTemplate: (d: Design) => void;
 }) {
   const { ch, ctx, stars, problems } = props;
   const cost = ch ? costOf(ch, ctx) : undefined;
@@ -1047,6 +1185,15 @@ function GoalsPanel(props: {
         <section>
           <h2>Free play</h2>
           <p className="panel-text">Set any traffic in the Traffic tab, then build and break your own design. Pick a traffic pattern other than Steady to run a full day.</p>
+          <h3>Start from a template</h3>
+          <div className="templates">
+            {TEMPLATES.map((t) => (
+              <button key={t.id} className="template" onClick={() => props.onTemplate(t.design)}>
+                <b>{t.title}</b>
+                <small>{t.text}</small>
+              </button>
+            ))}
+          </div>
         </section>
       )}
 

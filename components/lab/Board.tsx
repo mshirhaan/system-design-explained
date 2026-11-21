@@ -25,7 +25,28 @@ export interface View {
 export interface Selection {
   nodes: string[];
   edge: string | null;
+  note?: string | null;
 }
+
+/** Split a note into lines of at most `width` characters. */
+export function wrapNote(text: string, width = 26): string[] {
+  const out: string[] = [];
+  for (const para of (text || " ").split("\n")) {
+    let line = "";
+    for (const word of para.split(/\s+/)) {
+      if ((line + " " + word).trim().length > width && line) {
+        out.push(line);
+        line = word;
+      } else line = (line + " " + word).trim();
+    }
+    out.push(line);
+  }
+  return out.slice(0, 12);
+}
+export const noteSize = (text: string) => {
+  const lines = wrapNote(text);
+  return { lines, w: Math.max(...lines.map((l) => l.length), 8) * 7.8 + 26, h: lines.length * 18 + 20 };
+};
 
 export const MIN_ZOOM = 0.2;
 export const MAX_ZOOM = 2.4;
@@ -36,6 +57,7 @@ type Gesture =
   | { type: "marquee"; wx: number; wy: number }
   | { type: "drag"; ids: string[]; wx: number; wy: number; moved: boolean; clicked: string; additive: boolean }
   | { type: "link"; from: string }
+  | { type: "note"; id: string; wx: number; wy: number; ox: number; oy: number; moved: boolean }
   | { type: "pinch"; d0: number; k0: number; cx: number; cy: number; vx: number; vy: number };
 
 export interface BoardProps {
@@ -50,7 +72,11 @@ export interface BoardProps {
   onConnect: (from: string, to: string) => void;
   onQuickAdd: (from: string | null, gx: number, gy: number, clientX: number, clientY: number) => void;
   onDropKind: (kind: NodeKind, gx: number, gy: number) => void;
-  onContext: (target: { node?: string; edge?: string }, clientX: number, clientY: number) => void;
+  onContext: (target: { node?: string; edge?: string; note?: string }, clientX: number, clientY: number) => void;
+  /** Right-click on empty canvas. */
+  onCanvasMenu: (gx: number, gy: number, wx: number, wy: number, clientX: number, clientY: number) => void;
+  onMoveNote: (id: string, x: number, y: number) => void;
+  onEditNote: (id: string) => void;
   onSize?: (w: number, h: number) => void;
 }
 
@@ -69,6 +95,8 @@ export function Board(props: BoardProps) {
   const [drag, setDrag] = useState<{ ids: string[]; dgx: number; dgy: number } | null>(null);
   const [link, setLink] = useState<{ from: string; x: number; y: number; over: string | null } | null>(null);
   const [marquee, setMarquee] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
+  const [noteDrag, setNoteDrag] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
   const [hover, setHoverNow] = useState<string | null>(null);
   const hoverTimer = useRef<number | undefined>(undefined);
   /** Hover with a short grace period, so moving from a block onto its handle doesn't hide the handle. */
@@ -186,7 +214,20 @@ export function Board(props: BoardProps) {
     setLink({ from: id, x: w.x, y: w.y, over: null });
   };
 
+  const onNoteDown = (e: React.PointerEvent, id: string) => {
+    e.stopPropagation();
+    if (e.button === 2) return;
+    svgRef.current!.setPointerCapture(e.pointerId);
+    const w = toWorld(e.clientX, e.clientY);
+    const n = design.notes?.find((x) => x.id === id);
+    if (!n) return;
+    onSelect({ nodes: [], edge: null, note: id });
+    gesture.current = { type: "note", id, wx: w.x, wy: w.y, ox: n.x, oy: n.y, moved: false };
+  };
+
   const onMove = (e: React.PointerEvent) => {
+    const lp = local(e.clientX, e.clientY);
+    setMouse({ x: lp.sx, y: lp.sy });
     if (pointers.current.has(e.pointerId)) pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     const g = gesture.current;
     if (!g) return;
@@ -220,6 +261,12 @@ export function Board(props: BoardProps) {
       return;
     }
     if (g.type === "link") setLink({ from: g.from, x: w.x, y: w.y, over: nodeAt(w.x, w.y, g.from) });
+    if (g.type === "note") {
+      const dx = w.x - g.wx;
+      const dy = w.y - g.wy;
+      if (Math.abs(dx) + Math.abs(dy) > 3) g.moved = true;
+      if (g.moved) setNoteDrag({ id: g.id, x: Math.round((g.ox + dx) / 6) * 6, y: Math.round((g.oy + dy) / 6) * 6 });
+    }
   };
 
   const onUp = (e: React.PointerEvent) => {
@@ -246,6 +293,9 @@ export function Board(props: BoardProps) {
       if (drag && (drag.dgx || drag.dgy)) props.onMove(drag.ids, drag.dgx, drag.dgy);
       else if (!g.moved && !g.additive) onSelect({ nodes: [g.clicked], edge: null });
       setDrag(null);
+    } else if (g.type === "note") {
+      if (noteDrag && g.moved) props.onMoveNote(noteDrag.id, noteDrag.x, noteDrag.y);
+      setNoteDrag(null);
     } else if (g.type === "link" && link) {
       if (link.over) props.onConnect(link.from, link.over);
       else {
@@ -283,7 +333,13 @@ export function Board(props: BoardProps) {
         const gp = worldToGrid(w.x, w.y + 20);
         props.onDropKind(kind, gp.gx, gp.gy);
       }}
-      onContextMenu={(e) => e.preventDefault()}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        const w = toWorld(e.clientX, e.clientY);
+        const gp = worldToGrid(w.x, w.y + 20);
+        props.onCanvasMenu(gp.gx, gp.gy, w.x, w.y, e.clientX, e.clientY);
+      }}
+      onPointerLeave={() => setMouse(null)}
     >
       <svg
         ref={svgRef}
@@ -464,6 +520,41 @@ export function Board(props: BoardProps) {
             );
           })}
 
+          {/* sticky notes */}
+          {(design.notes ?? []).map((nt) => {
+            const at = noteDrag?.id === nt.id ? noteDrag : nt;
+            const { lines, w, h } = noteSize(nt.text);
+            const isSel = selection.note === nt.id;
+            return (
+              <g
+                key={nt.id}
+                className="board-note"
+                data-note={nt.id}
+                transform={`translate(${f(at.x)} ${f(at.y)})`}
+                onPointerDown={(e) => onNoteDown(e, nt.id)}
+                onDoubleClick={(e) => {
+                  e.stopPropagation();
+                  props.onEditNote(nt.id);
+                }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onSelect({ nodes: [], edge: null, note: nt.id });
+                  props.onContext({ note: nt.id }, e.clientX, e.clientY);
+                }}
+              >
+                <rect x={2} y={3} width={w} height={h} rx={6} fill={INK} />
+                <rect width={w} height={h} rx={6} fill="#fff4d8" stroke={isSel ? "#5a43a6" : INK} strokeWidth={isSel ? 2.6 : 1.6} />
+                <path d={`M${w - 14},0 L${w},14`} stroke={INK} strokeOpacity={0.25} />
+                {lines.map((l, i) => (
+                  <text key={i} className="st" x={13} y={22 + i * 18} fontSize={13} fontWeight={500}>
+                    {l}
+                  </text>
+                ))}
+              </g>
+            );
+          })}
+
           {/* connection handles: always drawn on top so neighbouring blocks never hide them */}
           {!drag && !link &&
             design.nodes
@@ -505,6 +596,35 @@ export function Board(props: BoardProps) {
           )}
         </g>
       </svg>
+      {(() => {
+        if (!hover || !mouse || drag || link || noteDrag || gesture.current) return null;
+        const n = byId.get(hover);
+        const st = n && sim.nodes[n.id];
+        if (!n || !st || n.kind === "users") return null;
+        const running = counts?.[n.id] ?? n.count;
+        const left = Math.min(mouse.x + 18, size.w - 230);
+        const top = Math.min(mouse.y + 18, size.h - 150);
+        return (
+          <div className="board-card" style={{ left, top }} aria-hidden="true">
+            <b>
+              {KINDS[n.kind].label}
+              {KINDS[n.kind].scalable && running > 1 ? ` ×${running}` : ""}
+            </b>
+            {st.down ? (
+              <span className="is-bad">Down: all its traffic fails</span>
+            ) : (
+              <>
+                <span>
+                  {Math.round(st.load).toLocaleString()} of {Math.round(st.capacity).toLocaleString()} req/s
+                </span>
+                <span className={st.utilisation > 1 ? "is-bad" : st.utilisation > 0.85 ? "is-warn" : ""}>{Math.round(st.utilisation * 100)}% busy</span>
+                {st.load > 0 && <span>{st.latencyMs >= 1000 ? `${(st.latencyMs / 1000).toFixed(1)} s` : `${Math.round(st.latencyMs)} ms`} per request</span>}
+                {st.dropped > 0.5 && <span className="is-bad">Dropping {Math.round(st.dropped).toLocaleString()} req/s</span>}
+              </>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }

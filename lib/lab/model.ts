@@ -36,9 +36,18 @@ export interface LabEdge {
   to: string;
 }
 
+/** A sticky note on the canvas. Positions are canvas (world) coordinates. */
+export interface Note {
+  id: string;
+  x: number;
+  y: number;
+  text: string;
+}
+
 export interface Design {
   nodes: LabNode[];
   edges: LabEdge[];
+  notes?: Note[];
 }
 
 export interface Workload {
