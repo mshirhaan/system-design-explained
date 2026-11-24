@@ -1419,6 +1419,10 @@ a.lab-card:hover {
 }
 
 /* ---------- Design Studio ---------- */
+/* On the studio page the site header scrolls away instead of sticking, so it can never cover the studio. */
+body:has(.studio) .site-header {
+  position: relative;
+}
 .studio {
   position: relative;
   --studio-h: calc(100vh - 61px - env(safe-area-inset-top, 0px));
